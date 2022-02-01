@@ -1,0 +1,303 @@
+!!! ---------------------------------------------------- !!!
+!!!                                                      !!!
+!!! Hope default environment (adapted/reorganized).      !!!
+!!! Standard.hop original by Professor Ross Paterson     !!!
+!!!                                                      !!!
+!!! Augusto Manzano (2022) - www.canal.manzano.pro.br    !!!
+!!!                                                      !!!
+!!! Standard.hop (modified) for POSIX version            !!!
+!!!                                                      !!!
+!!! This file should be used instead of the original     !!!
+!!! Hope language file on your system.                   !!!
+!!!                                                      !!!
+!!! This is free software an experimental programming    !!!
+!!! language. There is none guarantee that this tool     !!!
+!!! will lead you to the expected results, nor for       !!!
+!!! commercialization or suitability for a certain       !!!
+!!! purpose. Its original author and the developers who  !!!
+!!! continue the work cannot or may at any time be held  !!!
+!!! responsible.                                         !!!
+!!!                                                      !!!
+!!! ---------------------------------------------------- !!!
+
+! divMod
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! >>> infix operators                              <<< !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+infixr ->, o  : 2;
+infixr #, X   : 4;
+infixr ::, <> : 5; 
+infixr **     : 7; 
+
+infix or               : 1;
+infix and              : 2; 
+infix =, /=            : 3;
+infix <, =<, >, >=, .. : 4;
+infix +, -             : 5;
+infix *, /, div, mod   : 6;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+!!! >>> Type variables and other resources           <<< !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+typevar alpha, beta, gamma;
+
+abstype neg -> pos;
+abstype pos # pos;
+abstype char;    
+
+data truval     == false ++ true;    
+data relation   == LESS ++ EQUAL ++ GREATER;    
+data num        == succ num;
+data list alpha == nil ++ alpha :: list alpha;
+ 
+type alpha X beta == alpha # beta;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! >>> General functions                            <<< !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!! Operators
+    
+dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma;    
+dec <>                  : list alpha # list alpha -> list alpha;
+dec =, /=, <, =<, >, >= : alpha # alpha -> truval;
+dec +, -, *, /          : num # num -> num;
+dec **                  : num # num -> num;
+dec ..                  : num # num -> list num;
+
+!!! Functions
+
+dec argv                : list (list char);
+dec cbrt                : num -> num;
+dec const               : alpha # beta -> alpha;
+dec compare             : alpha # alpha -> relation;
+dec compare_cond        : relation -> alpha -> alpha -> alpha -> alpha;
+dec cmp_pair            : (alpha # beta) # (alpha # beta) -> relation;
+dec div, mod            : num # num -> num;
+dec error               : list char -> alpha;
+dec from                : num -> list num;
+dec fst                 : alpha # beta -> alpha;
+dec id                  : alpha -> alpha;
+dec negate              : num -> num;
+dec pred                : num -> num;  
+dec read                : list char -> list char;
+dec round               : num # num -> num;
+dec sign                : num -> num;  
+dec snd                 : alpha # beta -> beta;
+dec succ                : num -> num; 
+dec truncate            : num -> num;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!     
+!!! >>> Data conversion functions                    <<< !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  
+dec chr     : num -> char;
+dec num2str : num -> list char;
+dec ord     : char -> num;
+dec str2num : list char -> num;    
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! >>> Logic functions                              <<< !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  
+dec if_then_else : truval -> alpha -> alpha -> alpha;
+dec and          : truval # truval -> truval;  
+dec not          : truval -> truval;
+dec or           : truval # truval -> truval;
+dec xor          : truval # truval -> truval;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! >>> Math functions                               <<< !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!! Constants
+
+dec e, pi : num;
+
+!!! Basic functions
+  
+dec abs, ceil, floor      : num -> num;
+dec erf, erfc             : num -> num;  
+dec exp, log, log10, sqrt : num -> num;
+dec even, odd             : num -> truval;
+dec gcd, lcm, pow         : num # num -> num;
+dec max, min              : alpha # alpha -> alpha;
+dec quotRem               : num # num -> (num # num);
+
+!!! Trigonometric functions (radians)
+
+dec cos, csc, cot, sec, sin, tan, acos, asin, atan   : num -> num;
+dec cosh, sinh, tanh, todeg, torad, acot, acsc, asec : num -> num;
+dec acosh, asinh, atanh, acsch, asech, acoth         : num -> num;
+dec coth, csch, sech                                 : num -> num;
+dec atan2, hypot                                     : num # num -> num;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! >>> Protected functions (source code)            <<< !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+private;
+
+--- xor (x, y) <= x /= y;
+
+--- n..m <= if n > m 
+            then [] 
+            else if m > 140000
+                 then error ("Limite permitido: 140000.")
+                 else n :: (succ n .. m);
+                 
+--- (a # b) (x, y) <= (a x, b y);
+
+--- (a -> b) f <= b o f o a;
+    
+--- (f o g) x <= f (g x);
+
+--- [] <> ys <= ys;
+
+--- (x::xs) <> ys <= x :: (xs <> ys);
+
+--- (**) <= pow;
+
+--- e  <= exp 1;
+
+--- pi <= acos 0 * 2;
+
+dec deg : num;
+--- deg <= 57.2957795130823208767981548;
+
+dec rad : num;
+--- rad <=  0.0174532925199432957692369076848;
+
+--- acosh (x) <= log (x + sqrt (pow (x, 2) - 1));
+
+--- asinh (x) <= log (x + sqrt (pow (x, 2) + 1));
+
+--- atanh (x) <= log ((1 + x) / (1 - x)) / 2;
+
+--- acsch (x) <= log (sqrt (1 + (1 / pow (x, 2))) + 1 / x);
+
+--- asech (x) <= log (sqrt (1 / x - 1) * sqrt (1 / x + 1) + 1 / x);
+
+--- acoth (x) <= log ((x + 1) / (x - 1)) / 2;
+
+--- acot (x) <= atan (1 / x);
+
+--- acsc (x) <= asin (1 / x);
+
+--- asec (x) <= acos (1 / x);
+
+--- cbrt (x) <= pow (x, 1 / 3);
+
+--- char x <= x;
+
+--- const (x, _) <= x;
+
+--- coth (x) <= exp(0 - x) / (exp (x) - exp (0 - x)) * 2 + 1;
+
+--- csch (x) <= 2 / (exp (x) - exp (0 - x));
+
+--- sech (x) <= 2 / (exp (x) + exp (0 - x));
+
+--- cmp_pair ((x1, y1), (x2, y2)) <=
+	compare_cond (compare (x1, x2)) LESS (compare (y1, y2)) GREATER;
+	
+--- compare_cond LESS    l e g <= l;
+--- compare_cond EQUAL   l e g <= e;
+--- compare_cond GREATER l e g <= g;
+
+--- csc x <= 1 / sin x;
+
+--- cot x <= 1 / tan x;
+
+--- even n <= n mod 2 = 0;
+
+--- odd n <= n mod 2 /= 0;
+
+--- from n <= if n > 140000
+              then error ("Limite maximo de simulacao de infinito: 140000.")
+              else n .. 140000;
+
+--- fst (x, _) <= x;
+
+--- gcd (0, n) <= n;
+--- gcd (m, n) <= gcd (floor n mod floor m, m);
+
+--- lcm (_, 0) <= 0;
+--- lcm (0, _) <= 0;
+--- lcm (x, y) <= x * y div gcd (x, y);
+
+--- max (x, y) <= if x > y then x else y;
+
+--- min (x, y) <= if x < y then x else y;
+
+--- negate (x) <= 0 - x;
+
+--- pred 0       <= 0;
+--- pred (n + 1) <= n;
+
+--- quotRem (a, b) <= (a div b, a mod b);
+
+--- sec x <= 1 / cos x;
+
+--- succ n <= n + 1;
+
+--- not true  <= false;
+--- not false <= true;
+
+--- false and p <= false;
+--- true  and p <= p;
+
+--- true  or p <= true;
+--- false or p <= p;
+
+--- if true  then x else y <= x;
+--- if false then x else y <= y;
+
+--- id x <= x;
+
+--- x =  y <= (\ EQUAL   => true  | _ => false) (compare(x, y));
+--- x /= y <= (\ EQUAL   => false | _ => true)  (compare(x, y));
+--- x <  y <= (\ LESS    => true  | _ => false) (compare(x, y));
+--- x >= y <= (\ LESS    => false | _ => true)  (compare(x, y));
+--- x >  y <= (\ GREATER => true  | _ => false) (compare(x, y));
+--- x =< y <= (\ GREATER => false | _ => true)  (compare(x, y));
+
+dec print : alpha -> beta;	
+!!! print x <= return;		
+
+dec return : alpha;		
+
+--- round (n, d) <= if d < 0
+                    then error ("Second argument must be positive number.")
+                    else ceil (n * pow (10, d)) / pow (10, d);  
+
+--- sign n <= if n < 0 then (0 - 1) else
+              if n = 0 then 0       else 1;
+              
+--- snd (_, y) <= y;              
+
+--- tan x <= sin x / cos x;
+
+--- todeg r <= r * deg;
+
+--- torad r <= r * rad;
+
+--- truncate (x) <= if x < 0 
+                    then floor (x) + 1
+                    else floor (x);
+              
+dec write_element : alpha -> list alpha -> beta; 
+!!! write_element x <= write_list;	
+
+dec write_list : list alpha -> beta;
+--- write_list []     <= return;
+--- write_list(x::xs) <= write_element x xs;
