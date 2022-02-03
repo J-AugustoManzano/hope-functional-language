@@ -415,11 +415,11 @@ reduce : list alpha # (alpha # alpha -> alpha) # alpha -> alpha;
 reduce ([], f, n)      <= n;
 reduce (x :: xs, f, n) <= f (x, reduce (xs, f, n));
 
-repeat : num # alpha -> list alpha;
-repeat (n, a) <= if n = 0 
+replicate : num # alpha -> list alpha;
+replicate (n, a) <= if n = 0 
                  then []
-                 else a :: repeat (n - 1, a);
-
+                 else a :: replicate (n - 1, a);
+                 
 
 !!!!! replicate
 
