@@ -10,7 +10,7 @@
 !                                                                              !
 !                        Implementação em Hope das principais funcionalidades  !
 !                        encontradas na linguagem Haskell. Apoio operacional a !
-!                        partir do módulo padrão "Prelude".                    !
+!                        partir do módulo padrão "Prelude" e outros            !
 !                        Algumas funções do Prelude não estão incluídas neste  !
 !                        arquivo além de um conjunto de funções não existentes !
 !                        em Haskell.                                           !
@@ -79,33 +79,9 @@ ceiling n <= ceil n;
 const : alpha -> beta -> alpha;
 const x _ <= x;
 
-even : num -> truval;
-even n <= n mod 2 = 0;
-
-gcd : num # num -> num;
-gcd (0, n) <= n;
-gcd (m, n) <= gcd (floor n mod floor m, m);
-
-lcm : num # num -> num;
-lcm (_, 0) <= 0;
-lcm (0, _) <= 0;
-lcm (x, y) <= x * y div gcd (x, y);
-
-max : alpha # alpha -> alpha;
-max (x, y) <= if x > y then x else y;
-
-min : alpha # alpha -> alpha;
-min (x, y) <= if x < y then x else y;
-
-odd : num -> truval;
-odd n <= n mod 2 /= 0;
-
 pred : num -> num;
 pred 0     <= 0;
 pred (n+1) <= n;
-
-quotRem : num # num -> (num # num);
-quotRem (a,b) <= (a div b, a mod b);
 
 signum : num -> num;
 signum n <= if n < 0 
@@ -160,13 +136,26 @@ comp ([], f) <= [];
 comp (x :: xs, f) <= if f x 
                      then x :: comp (xs, f)
                      else comp (xs, f);
+                     
+span : (alpha -> truval) -> list alpha -> list alpha # list alpha;
+span cond [] <= ([], []);
+span cond (x::xs) <= if cond x
+                     then (x::f, a) where (f, a) == span cond xs
+                     else ([], x::xs);
+                     
+isSpace : char -> truval;
+isSpace c <= c = ' ' or c = '\t' or c = '\n';
 
+afterWith : (alpha -> truval) -> list alpha -> list alpha;
+afterWith cond [] <= [];
+afterWith cond (x::xs) <= if cond x 
+                          then afterWith cond xs 
+                          else x::xs;                        
+                    
 
 ! !!! -------------------------------------------------------------------- !!! !
 ! !!! SIMULAÇÃO MÓDULO "PRELUDE"                                           !!! !
 ! !!! -------------------------------------------------------------------- !!! !
-
-!!!!! and
 
 all : (alpha -> truval) # list alpha -> truval;
 all (_, [])      <= true;
@@ -179,19 +168,28 @@ any (p, x :: xs) <= p x or any (p, xs);
 
 !!!!! break
 
+
 !!!!! compare
+
 
 concat : list (list alpha) -> list alpha;
 concat []        <= [];
 concat (x :: xs) <= x <> concat xs;
 
-!!!!! concatMap
+concatMap : (alpha -> list beta) # list alpha -> list beta;
+concatMap (f, []) <= [];
+concatMap (f, x :: xs) <= f x <> concatMap (f, xs);
+!! >: concatMap(\x => [x+2], [1,3,5]);
+!! >> [3, 5, 7] : list num
 
-!!!!! curry
+curry : (alpha # beta -> gamma) -> alpha -> beta -> gamma;
+curry f <= lambda x => lambda y => f(x, y);
+!! >: curry fst 2 3;
+!! >> 2 : num
 
-!!!!! cycle
-
-!!!!! decodeFloat
+cycle : list num -> list num;
+cycle [] <= error ("Lista vazia!");
+cycle (x :: xs) <= x :: cycle (xs <> [x]);
 
 drop : num # list alpha -> list alpha;
 drop (0, xs)      <= xs;
@@ -203,8 +201,6 @@ dropWhile (_, [])      <= [];
 dropWhile (p, x :: xs) <= if p x 
                           then dropWhile (p, xs) 
                           else x :: xs;
-
-!!!!! either
 
 elem : alpha # list alpha -> truval;
 elem (x, [])      <= false;
@@ -219,64 +215,29 @@ unique (x :: xs) <= if member (x, xs)
                     then unique xs 
                     else x :: unique xs;     
 
-!!!!! encodeFloat
-
-!!!!! enumFrom
-
-!!!!! enumFromThen
-
-!!!!! enumFromThenTo
-
-!!!!! enumFromTo
-
-!!!!! exponent
-
-!!!!! fail
-
 filter : (alpha -> truval) # list alpha -> list alpha;
 filter (_, [])      <= [];
 filter (p, x :: xs) <= if p x 
                        then x :: filter (p, xs) 
                        else filter (p, xs);
 
-!!!!! flip
-
-!!!!! floatDigits
-
-!!!!! floatRadix
-
-!!!!! floatRange
-
-!!!!! fmap
-
 foldl : (alpha # beta -> alpha) # alpha # list beta -> alpha;
-foldl (f, v, [])      <= v;
-foldl (f, v, x :: xs) <= foldl (f, f (v, x), xs);
-
-!!!!! foldl1
+foldl (f, n, [])      <= n;
+foldl (f, n, x :: xs) <= foldl (f, f (n, x), xs);
 
 foldr : (alpha # beta -> beta) # beta # list alpha -> beta;
-foldr (f, v, [])      <= v;
-foldr (f, v, x :: xs) <= f (x, foldr (f, v, xs));
+foldr (f, n, [])      <= n;
+foldr (f, n, x :: xs) <= f (x, foldr (f, n, xs));
 
 concat2lst : list alpha # list alpha -> list alpha;
 concat2lst (xs, ys) <= foldr ((::), ys, xs);
 
-!!!!! foldr1
+foldl1 : (alpha # alpha -> alpha) # list alpha -> alpha;
+foldl1 (f, x :: xs) <= foldl (f, x, xs);
 
-!!!!! fromEnum
-
-!!!!! fromInteger
-
-!!!!! fromIntegral
-
-!!!!! fromRational
-
-!!!!! getChar
-
-!!!!! getContents
-
-!!!!! getLine
+foldr1 : (alpha # alpha -> alpha) # list alpha -> alpha;
+foldr1 (f, [x]) <= x;
+foldr1 (f, x :: xs) <= f (x, foldr1 (f, xs));
 
 head : list alpha -> alpha;
 head []       <= error ("Empty list!");
@@ -292,25 +253,16 @@ insert (n, x :: xs) <= if n =< x
                        then n :: x :: xs 
                        else x :: insert (n, xs);
 
+intersperse : alpha # list alpha -> list alpha;
+intersperse  (_, []) <= [];
+intersperse  (_, [x]) <= [x];
+intersperse (n, x :: xs) <= x :: n :: intersperse (n, xs);
+!! >: intersperse (0, [1, 2, 3, 4, 5]);
+!! >> [1, 0, 2, 0, 3, 0, 4, 0, 5] : list num
+
 sort : list alpha -> list alpha;
 sort []        <= [];
 sort (x :: xs) <= insert (x, sort xs);
-
-!!!!! interact
-
-!!!!! ioError
-
-!!!!! isDenormalized
-
-!!!!! isIEEE
-
-!!!!! isInfinite
-
-!!!!! isNaN
-
-!!!!! isNegativeZero
-
-!!!!! iterate
 
 last : list alpha -> alpha;
 last ([x])     <= x;
@@ -319,7 +271,6 @@ last (x :: xs) <= last xs;
 length : list alpha -> num;
 length []        <= 0;
 length (x :: xs) <= 1 + length xs;
-
 
 listPow : num # list num -> list num;
 listPow (_, [])      <= [];
@@ -331,21 +282,17 @@ getPos (n, x :: xs) <= if n = x
                        then length xs 
                        else getPos (n, xs);
 
-!!!!! lex
-
-!!!!! lines
-
-!!!!! lookup
+lookup : alpha # list (alpha # beta) -> beta;
+lookup (_, []) <= error "Data not found!";
+lookup (k, ((x, y) :: xyz)) <= if k = x
+                               then y
+                               else lookup (k, xyz);
+!! >: lookup ('c', [('a', 0), ('b', 1), ('c', 2)]);
+!! >> 2 : num                               
 
 map : (alpha -> beta) # list alpha -> list beta;
 map (_, [])      <= [];
 map (f, x :: xs) <= f x :: map (f, xs);
-
-!!!!! mapM
-
-!!!!! mapM_
-
-!!!!! maxBound
 
 maximum : list alpha -> alpha;
 maximum []             <= error ("Empty list!");
@@ -354,10 +301,6 @@ maximum (x :: y :: xs) <= if x > y
                           then maximum (x :: xs) 
                           else maximum (y :: xs);
 
-!!!!! maybe
-
-!!!!! minBound
-
 minimum : list alpha -> alpha;
 minimum []             <= error ("Empty list!");
 minimum ([x])          <= x;
@@ -365,46 +308,22 @@ minimum (x :: y :: xs) <= if x < y
                           then minimum (x :: xs) 
                           else minimum (y :: xs);
 
-!!!!! notElem
-
 null : list alpha -> truval;
 null []     <= true;
 null (_::_) <= false;
 
-!!!!! otherwise
-
-!!!!! print
+print : alpha -> alpha;
+print n <= n;
+!! >: print "alo";
+!! >> "alo" : list char
+!! >: print [1,2,3]<>[4,5];
+!! >> [1, 2, 3, 4, 5] : list num
 
 product : list num -> num;
 product xs <= foldl ((*), 1, xs);
 
-!!!!! putChar
-
-!!!!! putStr
-
-!!!!! putStrLn
-
-!!!!! quotRem
-
-!!!!! read
-
-!!!!! readFile
-
-!!!!! readIO
-
-!!!!! readList
-
-!!!!! readLn
-
-!!!!! readParen
-
-!!!!! reads
-
-!!!!! readsPrec
-
-!!!!! realToFrac
-
-!!!!! recip
+quotRem : num # num -> (num # num);
+quotRem (a, b) <= (a div b, a mod b);
 
 range : num # num # num -> list num;
 range (i, f, p) <= if i > f 
@@ -414,14 +333,6 @@ range (i, f, p) <= if i > f
 reduce : list alpha # (alpha # alpha -> alpha) # alpha -> alpha;
 reduce ([], f, n)      <= n;
 reduce (x :: xs, f, n) <= f (x, reduce (xs, f, n));
-
-replicate : num # alpha -> list alpha;
-replicate (n, a) <= if n = 0 
-                 then []
-                 else a :: replicate (n - 1, a);
-
-
-!!!!! return
 
 reverseAux : list alpha # list alpha -> list alpha;
 reverseAux([], ys)    <= ys;
@@ -434,42 +345,36 @@ find : alpha # list alpha -> num;
 find (_, [])      <= error ("Empty list!");
 find (n, x :: xs) <= getPos (n, reverse (x :: xs));
 
-!!!!! scaleFloat
+scanl : (beta # alpha -> beta) # beta # list alpha -> list beta;
+scanl (_, n, []) <= [n];
+scanl (f, n, x :: xs) <= n :: scanl (f, f (n, x), xs);
 
-!!!!! scanl
+scanl1 : (alpha #alpha -> alpha) # list alpha -> list alpha;
+scanl1 (_, []) <= [];
+scanl1 (f, x :: xs) <= scanl (f, x, xs);
 
-!!!!! scanl1
 
 !!!!! scanr
 
+
 !!!!! scanr1
 
-!!!!! seq
-
-!!!!! sequence
-
-!!!!! sequence_
-
-!!!!! show
-
-!!!!! showChar
-
-!!!!! showList
-
-!!!!! showParen
-
-!!!!! shows
-
-!!!!! showsPrec
-
-!!!!! showString
-
-!!!!! significand
 
 take : num # list alpha -> list alpha;
 take (n, [])      <= [];
 take (0, xs)      <= [];
 take (n, x :: xs) <= x :: take (n - 1, xs);
+
+iterate : (alpha -> alpha) # alpha -> list alpha;
+iterate (f, x) <= x :: iterate (f, f x);
+!! >: take (10, (iterate (\x => x * 2, 1)));
+!! >> [1, 2, 4, 8, 16, 32, 64, 128, 256, 512] : list num
+
+repeat : alpha -> list alpha;
+repeat x <= x :: repeat x;
+
+replicate : num # alpha -> list alpha;
+replicate (n, x) <= take (n, repeat x);
 
 splitAt : num # list alpha -> list alpha # list alpha;
 splitAt (n, xs) <= (take (n, xs), drop (n, xs));
@@ -482,7 +387,8 @@ splitAt' (n, y :: ys) <= if n < 0
                          else (y :: a, b) 
                          where (a, b) == splitAt' (n - 1, ys);  
 
-!!!!! subtract
+subtract : num # num -> num;
+subtract (x, y) <= y - x;
 
 sum : list num -> num;
 sum []        <= 0;
@@ -498,42 +404,51 @@ takeWhile (p, x :: xs) <= if p x
                           then x :: takeWhile (p, xs) 
                           else [];
 
-!!!!! toEnum
+uncurry : (alpha -> beta -> gamma) -> alpha # beta -> gamma;
+uncurry f (x, y) <= f x y;
 
-!!!!! toInteger
+until : (alpha -> truval) # (alpha -> alpha) # alpha -> alpha;
+until (p, f, x) <= if p x 
+                   then x 
+                   else until (p, f, f x);
 
-!!!!! toRational
+unwordsAux : list (list char) -> list char;
+unwordsAux [] <= [];
+unwordsAux (x :: xs) <= x <> " " <> unwordsAux xs;
 
-!!!!! uncurry
+unwords : list (list char) -> list char;
+unwords lst <= init (unwordsAux lst);
 
-!!!!! undefined
+uzp_base : list alpha # list alpha # list (alpha # alpha) -> list alpha # list alpha;
+uzp_base (xs, ys, []) <= (reverse xs, reverse ys);
+uzp_base (xs, ys, (x, y) :: zs) <= uzp_base (x :: xs, y :: ys, zs);
 
-!!!!! unlines
+unzip : list (alpha # alpha) -> list alpha # list alpha;
+unzip [] <= ([], []);
+unzip xs <= uzp_base ([], [], xs);
 
-!!!!! until
-
-!!!!! unwords
-
-!!!!! unzip
 
 !!!!! unzip3
 
-!!!!! userError
 
-!!!!! words
-
-!!!!! writeFile
+words : list char -> list(list char);
+  wordsAux : list char -> list(list char);
+  wordsAux "" <= [];
+  wordsAux cs <= w :: words rest where (w, rest) == span (not o isSpace) cs;
+words cs <= wordsAux (afterWith isSpace cs);
 
 zip : list alpha # list beta -> list (alpha # beta);
 zip ([], _)            <= [];
 zip (_, [])            <= [];
 zip (x :: xs, y :: ys) <= (x, y) :: zip (xs, ys);
 
-!!!!! zip3
+zip3 : (list alpha # list beta # list gamma) -> list (alpha # beta # gamma);
+zip3 (_, _, _) <= [];
+zip3 (a :: as, b :: bs, c :: cs) <= (a, b, c) :: zip3 (as, bs, cs);
 
-!!!!! zipWith
+zipWith : (alpha # beta -> gamma) # list alpha # list beta -> list gamma;
+zipWith (_, _, _) <= [];
+zipWith (f, x :: xs, y :: ys) <= f (x, y) :: zipWith (f, xs, ys);
+
 
 !!!!! zipWith3
-
-
-
