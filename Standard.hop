@@ -20,6 +20,8 @@
 !!!                                                      !!!
 !!! ---------------------------------------------------- !!!
 
+! divMod
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! >>> infix operators                              <<< !!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -128,7 +130,6 @@ dec exp, log, log10, sqrt : num -> num;
 dec even, odd             : num -> truval;
 dec gcd, lcm, pow         : num # num -> num;
 dec max, min              : alpha # alpha -> alpha;
-dec quotRem               : num # num -> (num # num);
 
 !!! Trigonometric functions (radians)
 
@@ -241,8 +242,6 @@ dec rad : num;
 
 --- pred 0       <= 0;
 --- pred (n + 1) <= n;
-
---- quotRem (a, b) <= (a div b, a mod b);
 
 --- sec x <= 1 / cos x;
 
