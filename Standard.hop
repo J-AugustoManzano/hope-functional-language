@@ -43,7 +43,7 @@ infix *, /, div, mod   : 6;
 !!! >>> Type variables and other resources           <<< !!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-typevar alpha, beta, gamma;
+typevar alpha, beta, gamma, delta, epsilon, dzeta, eta, teta, iota, capa;
 
 abstype neg -> pos;
 abstype pos # pos;
