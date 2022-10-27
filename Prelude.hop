@@ -450,5 +450,8 @@ zipWith : (alpha # beta -> gamma) # list alpha # list beta -> list gamma;
 zipWith (_, _, _) <= [];
 zipWith (f, x :: xs, y :: ys) <= f (x, y) :: zipWith (f, xs, ys);
 
-
-!!!!! zipWith3
+zipWith3 : (alpha # beta # gamma -> delta) # list alpha # list beta # list gamma -> list delta;
+zipWith3 (_, _, _) <= [];
+zipWith3 (f, a :: ax, b :: bx, c :: cx) <= f (a, b, c) :: zipWith3 (f, ax, bx, cx);
+!! :> zipWith3 ((\x, y, z => x+2*y+3*z), 1..5, 5..10, 10..15);
+!! >> [41, 47, 53, 59, 65] : list num
