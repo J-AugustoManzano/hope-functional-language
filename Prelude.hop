@@ -419,13 +419,13 @@ unwordsAux (x :: xs) <= x <> " " <> unwordsAux xs;
 unwords : list (list char) -> list char;
 unwords lst <= init (unwordsAux lst);
 
-uzp_base : list alpha # list alpha # list (alpha # alpha) -> list alpha # list alpha;
-uzp_base (xs, ys, []) <= (reverse xs, reverse ys);
-uzp_base (xs, ys, (x, y) :: zs) <= uzp_base (x :: xs, y :: ys, zs);
+unzipAux : list alpha # list alpha # list (alpha # alpha) -> list alpha # list alpha;
+unzipAux (xs, ys, []) <= (reverse xs, reverse ys);
+unzipAux (xs, ys, (x, y) :: zs) <= unzipAux (x :: xs, y :: ys, zs);
 
 unzip : list (alpha # alpha) -> list alpha # list alpha;
 unzip [] <= ([], []);
-unzip xs <= uzp_base ([], [], xs);
+unzip xs <= unzipAux ([], [], xs);
 
 
 !!!!! unzip3
