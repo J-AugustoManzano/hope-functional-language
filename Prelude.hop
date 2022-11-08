@@ -165,12 +165,9 @@ any : (alpha -> truval) # list alpha -> truval;
 any (_, [])      <= false;
 any (p, x :: xs) <= p x or any (p, xs); 
 
-
 !!!!! break
 
-
 !!!!! compare
-
 
 concat : list (list alpha) -> list alpha;
 concat []        <= [];
@@ -353,12 +350,9 @@ scanl1 : (alpha #alpha -> alpha) # list alpha -> list alpha;
 scanl1 (_, []) <= [];
 scanl1 (f, x :: xs) <= scanl (f, x, xs);
 
-
 !!!!! scanr
 
-
 !!!!! scanr1
-
 
 take : num # list alpha -> list alpha;
 take (n, [])      <= [];
@@ -427,9 +421,21 @@ unzip : list (alpha # alpha) -> list alpha # list alpha;
 unzip [] <= ([], []);
 unzip xs <= unzipAux ([], [], xs);
 
+unzipAux3 : list alpha # list alpha # list alpha # list (alpha # alpha # alpha) -> list alpha # list alpha # list alpha;
+unzipAux3 (xs, ys, zs, []) <= (reverse xs, reverse ys, reverse zs);
+unzipAux3 (xs, ys, zs, (x, y, z) :: as) <= unzipAux3 (x :: xs, y :: ys, z :: zs, as);
 
-!!!!! unzip3
+unzip3 : list (alpha # alpha # alpha) -> list alpha # list alpha # list alpha;
+unzip3 [] <= ([], [], []);
+unzip3 xs <= unzipAux3 ([], [], [], xs);
 
+!!!!! unzip4
+
+!!!!! unzip5
+
+!!!!! unzip6
+
+!!!!! unzip7
 
 words : list char -> list(list char);
   wordsAux : list char -> list(list char);
@@ -449,6 +455,12 @@ zip3 (a :: as, b :: bs, c :: cs) <= (a, b, c) :: zip3 (as, bs, cs);
 zip4 : list alpha # list beta # list gamma # list delta -> list (alpha # beta # gamma # delta);
 zip4 (_, _, _, _) <= [];
 zip4 (a :: as, b :: bs, c :: cs, d :: ds) <= (a, b, c, d) :: zip4 (as, bs, cs, ds);
+
+!!!!! zip5
+
+!!!!! zip6
+
+!!!!! zip7
 
 zipWith : (alpha # beta -> gamma) # list alpha # list beta -> list gamma;
 zipWith (_, _, _) <= [];
