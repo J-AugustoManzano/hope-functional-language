@@ -2,7 +2,7 @@
 !                                                                              !
 ! Módulo Hope .........: Prelude.hop                                           !
 !                                                                              !
-! Simulação Haskell ...: Data.Bool / Math / NumMathConst / GHC.List            !
+! Simulação Haskell ...: Prelude                                               !
 ! Objetivo ............: Simulação base Haskell em Hope                        !
 ! Copyright ...........: (c) Augusto Manzano, 2022                             !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0 (https://creative !
