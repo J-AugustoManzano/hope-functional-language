@@ -124,12 +124,12 @@ dec e, pi : num;
 
 !!! Basic functions
   
-dec abs, ceil, floor      : num -> num;
-dec erf, erfc             : num -> num;  
-dec exp, log, log10, sqrt : num -> num;
-dec even, odd             : num -> truval;
-dec gcd, lcm, pow         : num # num -> num;
-dec max, min              : alpha # alpha -> alpha;
+dec abs, ceil, floor       : num -> num;
+dec erf, erfc              : num -> num;  
+dec exp, log, log10, sqrt  : num -> num;
+dec even, odd              : num -> truval;
+dec gcd, lcm, pow, logBase : num # num -> num;
+dec max, min               : alpha # alpha -> alpha;
 
 !!! Trigonometric functions (radians)
 
@@ -233,6 +233,8 @@ dec rad : num;
 --- lcm (_, 0) <= 0;
 --- lcm (0, _) <= 0;
 --- lcm (x, y) <= x * y div gcd (x, y);
+
+--- logBase (x, y) <= log y / log x;
 
 --- max (x, y) <= if x > y then x else y;
 
