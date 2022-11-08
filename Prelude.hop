@@ -446,6 +446,10 @@ zip3 : (list alpha # list beta # list gamma) -> list (alpha # beta # gamma);
 zip3 (_, _, _) <= [];
 zip3 (a :: as, b :: bs, c :: cs) <= (a, b, c) :: zip3 (as, bs, cs);
 
+zip4 : list alpha # list beta # list gamma # list delta -> list (alpha # beta # gamma # delta);
+zip4 (_, _, _, _) <= [];
+zip4 (a :: as, b :: bs, c :: cs, d :: ds) <= (a, b, c, d) :: zip4 (as, bs, cs, ds);
+
 zipWith : (alpha # beta -> gamma) # list alpha # list beta -> list gamma;
 zipWith (_, _, _) <= [];
 zipWith (f, x :: xs, y :: ys) <= f (x, y) :: zipWith (f, xs, ys);
