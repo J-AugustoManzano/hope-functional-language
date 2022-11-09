@@ -3,6 +3,7 @@
 ! Módulo Hope .........: Prelude.hop                                           !
 !                                                                              !
 ! Simulação Haskell ...: Prelude                                               !
+! Versão ..............: 1.0                                                   !
 ! Objetivo ............: Simulação base Haskell em Hope                        !
 ! Copyright ...........: (c) Augusto Manzano, 2022                             !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0 (https://creative !
@@ -18,140 +19,7 @@
 ! Estabilidade ........: Experimental (em desenvolvimento)                     !
 ! Dependência .........: Standard.hop (modificada)                             !
 !                                                                              !
-! ---------------------------------------------------------------------------- !
-
-
-! !!! -------------------------------------------------------------------- !!! !
-! !!! CONSTANTES MATEMÁTICAS                                               !!! !
-! !!! -------------------------------------------------------------------- !!! !
-
-m_1_sqrt_2 : num; 
-m_1_sqrt_2 <= 0.707106781186548;
-
-m_2_sqrt_pi : num; 
-m_2_sqrt_pi <= 1.12837916709551;
-
-m_epsilon : num;
-m_epsilon <= 2.22044604925031;
-
-m_sqrt_2 : num; 
-m_sqrt_2 <= 1.4142135623731;
-
-m_sqrt_2_pi : num; 
-m_sqrt_2_pi <= 2.506628274631;
-
-m_sqrt_eps : num; 
-m_sqrt_eps <= 1.49011611938476;
-
-m_ln_sqrt_2_pi : num; 
-m_ln_sqrt_2_pi <= 0.918938533204673;
-
-m_eulerMascheroni : num;
-m_eulerMascheroni <= 0.577215664901533;
-
-m_huge : num;
-m_huge <= 1.79769313486232;
-
-m_tiny : num;
-m_tiny <= 2.2250738585072;
-
-m_max_exp : num;
-m_max_exp <= 1024;
-
-m_max_log : num;
-m_max_log <= 709.782712893384;
-
-m_min_log : num;
-m_min_log <= 0 - 708.3964185322641;
-
-
-! !!! -------------------------------------------------------------------- !!! !
-! !!! FUNÇÕES BÁSICAS                                                      !!! !
-! !!! -------------------------------------------------------------------- !!! !
-
-bool : alpha -> alpha -> truval -> alpha;
-bool f _ false <= f;
-bool _ t true  <= t;
-
-ceiling : num -> num;
-ceiling n <= ceil n;
-
-const : alpha -> beta -> alpha;
-const x _ <= x;
-
-pred : num -> num;
-pred 0     <= 0;
-pred (n+1) <= n;
-
-signum : num -> num;
-signum n <= if n < 0 
-            then 0-1 
-            else  if n = 0 
-                  then 0 
-                  else 1;
-                  
-logBase : num -> num -> num;
-logBase x y <= log y / log x;                  
-
-truncate : num -> num;
-truncate n <= floor n;
-
-fst : (alpha # beta) -> alpha;
-fst (x,_) <= x;
-
-snd : (alpha # beta) -> beta;
-snd (_,y) <= y;
-
-properFraction : num -> num # num;
-properFraction x <= (n, r) where n == floor x
-                           where r == x - floor x; 
-            
-round : num -> num;
-round x <= if compare (half_down, 0.0) = LESS    then n else 
-           if compare (half_down, 0.0) = EQUAL   then if even n then n else m else
-           if compare (half_down, 0.0) = GREATER then m else 0.0
-              where half_down == abs r - 0.5  
-              where m         == if r < 0.0 then n - 1 else n + 1    
-              where (n, r)    == properFraction x;
-
-negate : num -> num;
-negate x <= 0 - x;
-
-quot : num -> num -> num;
-quot n d <= n div d;
-
-rem : num -> num -> num;
-rem n d <= n mod d;
-
-divMod : num -> num -> num # num;
-divMod n d <= (quot n d, rem n d);
-
-
-! !!! -------------------------------------------------------------------- !!! !
-! !!! FUNÇÕES GERAIS DE APOIO - NÃO PRELUDE                                !!! !
-! !!! -------------------------------------------------------------------- !!! !
-
-comp : list alpha # (alpha -> truval) -> list alpha;
-comp ([], f) <= [];
-comp (x :: xs, f) <= if f x 
-                     then x :: comp (xs, f)
-                     else comp (xs, f);
-                     
-span : (alpha -> truval) -> list alpha -> list alpha # list alpha;
-span cond [] <= ([], []);
-span cond (x::xs) <= if cond x
-                     then (x::f, a) where (f, a) == span cond xs
-                     else ([], x::xs);
-                     
-isSpace : char -> truval;
-isSpace c <= c = ' ' or c = '\t' or c = '\n';
-
-afterWith : (alpha -> truval) -> list alpha -> list alpha;
-afterWith cond [] <= [];
-afterWith cond (x::xs) <= if cond x 
-                          then afterWith cond xs 
-                          else x::xs;                        
-                    
+! ---------------------------------------------------------------------------- !   
 
 ! !!! -------------------------------------------------------------------- !!! !
 ! !!! SIMULAÇÃO MÓDULO "PRELUDE"                                           !!! !
@@ -306,8 +174,8 @@ minimum (x :: y :: xs) <= if x < y
                           else minimum (y :: xs);
 
 null : list alpha -> truval;
-null []     <= true;
-null (_::_) <= false;
+null []       <= true;
+null (_ :: _) <= false;
 
 print : alpha -> alpha;
 print n <= n;
@@ -437,7 +305,7 @@ unzip3 xs <= unzipAux3 ([], [], [], xs);
 
 !!!!! unzip7
 
-words : list char -> list(list char);
+words : list char -> list (list char);
   wordsAux : list char -> list(list char);
   wordsAux "" <= [];
   wordsAux cs <= w :: words rest where (w, rest) == span (not o isSpace) cs;
