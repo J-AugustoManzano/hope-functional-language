@@ -44,7 +44,7 @@ infix *, /, div, mod   : 6;
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 typevar alpha, beta, gamma, delta, epsilon, 
-        dzeta, eta, teta, iota, capa;
+        dzeta, eta,  teta,  iota,  capa;
 
 abstype char;  
 abstype neg -> pos;
