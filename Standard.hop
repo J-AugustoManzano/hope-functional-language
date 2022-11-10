@@ -25,10 +25,10 @@
 !!! >>> infix operators                              <<< !!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-infixr ->, o  : 2;
-infixr #, X   : 4;
-infixr ::, <> : 5; 
-infixr **, ^  : 7; 
+infixr ->, o, /\ : 2;
+infixr #, X      : 4;
+infixr ::, <>    : 5; 
+infixr **, ^     : 7; 
 
 infix or               : 1;
 infix and              : 2; 
@@ -94,12 +94,13 @@ dec rad : num;
 
 !!! Operators
     
-dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma;    
-dec <>                  : list alpha # list alpha -> list alpha;
-dec =, /=, <, =<, >, >= : alpha # alpha -> truval;
-dec +, -, *, /          : num # num -> num;
 dec **, ^               : num # num -> num;
 dec ..                  : num # num -> list num;
+dec /\                  : (alpha -> beta) # (alpha -> beta') -> alpha -> beta # beta';
+dec +, -, *, /          : num # num -> num;
+dec <>                  : list alpha # list alpha -> list alpha;
+dec =, /=, <, =<, >, >= : alpha # alpha -> truval;
+dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma;    
 
 !!! Various functions - general use
 
@@ -246,6 +247,8 @@ private;
 --- (**) <= pow;
 
 --- (^) <= pow;
+
+--- (f /\ g) x <= (f x, g x);
 
 --- afterWith cond [] <= [];
 --- afterWith cond (x::xs) <= if cond x 
