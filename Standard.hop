@@ -79,12 +79,13 @@ dec m_sqrt_2_pi       : num;
 dec m_sqrt_eps        : num; 
 dec m_tiny            : num;;
 
-!!! Other constants
+!!! Other constants - general use
 
 dec e   : num;
 dec deg : num;
 dec pi  : num;
 dec rad : num;
+
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
