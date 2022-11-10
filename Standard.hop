@@ -172,7 +172,7 @@ dec max, min               : alpha # alpha -> alpha;
 !!! Trigonometric functions (radians)
 
 dec cos, csc, cot, sec, sin, tan, acos, asin, atan   : num -> num;
-dec cosh, sinh, tanh, todeg, torad, acot, acsc, asec : num -> num;
+dec cosh, sinh, tanh, toDeg, toRad, acot, acsc, asec : num -> num;
 dec acosh, asinh, atanh, acsch, asech, acoth         : num -> num;
 dec coth, csch, sech                                 : num -> num;
 dec atan2, hypot                                     : num # num -> num;
@@ -418,9 +418,13 @@ dec return : alpha;
 
 --- tan x <= sin x / cos x;
 
---- todeg r <= r * deg;
+--- toDeg r <= r * deg;
 
---- torad r <= r * rad;
+--- toLower c <= if isUpper c then chr(ord c + 32) else c;
+
+--- toRad r <= r * rad;
+
+--- toUpper c <= if isLower c then chr(ord c - 32) else c;
 
 --- truncate x <= if x < 0 
                   then floor (x) + 1
