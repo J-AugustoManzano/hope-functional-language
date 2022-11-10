@@ -65,26 +65,26 @@ type alpha X beta == alpha # beta;
 
 !!! C++ style
 
-dec m_1_sqrt_2 : num; 
-dec m_2_sqrt_pi : num; 
-dec m_epsilon : num;
+dec m_1_sqrt_2        : num; 
+dec m_2_sqrt_pi       : num; 
+dec m_epsilon         : num;
 dec m_eulerMascheroni : num;
-dec m_huge : num;
-dec m_ln_sqrt_2_pi : num; 
-dec m_max_exp : num;
-dec m_max_log : num;
-dec m_min_log : num;
-dec m_sqrt_2 : num; 
-dec m_sqrt_2_pi : num; 
-dec m_sqrt_eps : num; 
-dec m_tiny : num;
+dec m_huge            : num;
+dec m_ln_sqrt_2_pi    : num; 
+dec m_max_exp         : num;
+dec m_max_log         : num;
+dec m_min_log         : num;
+dec m_sqrt_2          : num; 
+dec m_sqrt_2_pi       : num; 
+dec m_sqrt_eps        : num; 
+dec m_tiny            : num;;
 
-!!! Various constants
+!!! Other constants
 
-dec e, pi : num;
+dec e   : num;
 dec deg : num;
+dec pi  : num;
 dec rad : num;
-
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
