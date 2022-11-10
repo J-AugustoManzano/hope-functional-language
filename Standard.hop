@@ -134,7 +134,7 @@ dec num2str : num -> list char;
 dec ord     : char -> num;
 dec str2num : list char -> num;    
 
-!!! Logic functions
+!!! Logic functions- general use
  
 dec afterWith    : (alpha -> truval) -> list alpha -> list alpha;
 dec and          : truval # truval -> truval;  
@@ -144,11 +144,14 @@ dec comp         : list alpha # (alpha -> truval) -> list alpha;
 dec compare      : alpha # alpha -> relation;
 dec compare_cond : relation -> alpha -> alpha -> alpha -> alpha;
 dec if_then_else : truval -> alpha -> alpha -> alpha;
-dec isSpace      : char -> truval;
 dec not          : truval -> truval;
 dec or           : truval # truval -> truval;
 dec span         : (alpha -> truval) -> list alpha -> list alpha # list alpha;
 dec xor          : truval # truval -> truval;
+
+!!! Logic functions - character verification
+
+dec isSpace : char -> truval;
 
 !!! Basic functions
   
