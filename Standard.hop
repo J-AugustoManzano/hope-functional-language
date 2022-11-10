@@ -28,7 +28,7 @@
 infixr ->, o  : 2;
 infixr #, X   : 4;
 infixr ::, <> : 5; 
-infixr **     : 7; 
+infixr **, ^  : 7; 
 
 infix or               : 1;
 infix and              : 2; 
@@ -77,7 +77,7 @@ dec m_min_log         : num;
 dec m_sqrt_2          : num; 
 dec m_sqrt_2_pi       : num; 
 dec m_sqrt_eps        : num; 
-dec m_tiny            : num;;
+dec m_tiny            : num;
 
 !!! Other constants - general use
 
@@ -98,7 +98,7 @@ dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma;
 dec <>                  : list alpha # list alpha -> list alpha;
 dec =, /=, <, =<, >, >= : alpha # alpha -> truval;
 dec +, -, *, /          : num # num -> num;
-dec **                  : num # num -> num;
+dec **, ^               : num # num -> num;
 dec ..                  : num # num -> list num;
 
 !!! Various functions - general use
@@ -134,7 +134,7 @@ dec num2str : num -> list char;
 dec ord     : char -> num;
 dec str2num : list char -> num;    
 
-!!! Logic functions- general use
+!!! Logic functions - general use
  
 dec afterWith    : (alpha -> truval) -> list alpha -> list alpha;
 dec and          : truval # truval -> truval;  
@@ -238,6 +238,8 @@ private;
 --- (x::xs) <> ys <= x :: (xs <> ys);
 
 --- (**) <= pow;
+
+--- (^) <= pow;
 
 --- afterWith cond [] <= [];
 --- afterWith cond (x::xs) <= if cond x 
