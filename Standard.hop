@@ -143,8 +143,10 @@ dec cmp_pair     : (alpha # beta) # (alpha # beta) -> relation;
 dec comp         : list alpha # (alpha -> truval) -> list alpha;
 dec compare      : alpha # alpha -> relation;
 dec compare_cond : relation -> alpha -> alpha -> alpha -> alpha;
+dec even         : num -> truval;
 dec if_then_else : truval -> alpha -> alpha -> alpha;
 dec not          : truval -> truval;
+dec odd          : num -> truval;
 dec or           : truval # truval -> truval;
 dec span         : (alpha -> truval) -> list alpha -> list alpha # list alpha;
 dec xor          : truval # truval -> truval;
@@ -158,7 +160,6 @@ dec isSpace : char -> truval;
 dec abs, ceil, floor       : num -> num;
 dec erf, erfc              : num -> num;  
 dec exp, log, log10, sqrt  : num -> num;
-dec even, odd              : num -> truval;
 dec gcd, lcm, pow, logBase : num # num -> num;
 dec max, min               : alpha # alpha -> alpha;
 
