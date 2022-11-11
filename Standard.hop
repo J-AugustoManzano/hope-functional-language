@@ -22,7 +22,7 @@
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! >>> infix operators                              <<< !!!
+!!! >>> infix/infixr operators                       <<< !!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 infixr ->, o, /\ : 2;
@@ -36,7 +36,7 @@ infix =, /=            : 3;
 infix <, =<, >, >=, .. : 4;
 infix +, -             : 5;
 infix *, /, div, mod   : 6;
-
+infix .                : 9;
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
@@ -53,7 +53,8 @@ abstype pos # pos;
 data list alpha == nil ++ alpha :: list alpha;
 data num        == succ num;
 data relation   == LESS ++ EQUAL ++ GREATER;    
-data truval     == false ++ true;    
+data truval     == false ++ true;  
+data void       == Nothing;  
  
 type alpha X beta == alpha # beta;
 
@@ -95,12 +96,13 @@ dec rad : num;
 !!! Operators
     
 dec **, ^               : num # num -> num;
+dec .                   : alpha # (alpha -> beta) -> beta;
 dec ..                  : num # num -> list num;
 dec /\                  : (alpha -> beta) # (alpha -> beta') -> alpha -> beta # beta';
 dec +, -, *, /          : num # num -> num;
 dec <>                  : list alpha # list alpha -> list alpha;
 dec =, /=, <, =<, >, >= : alpha # alpha -> truval;
-dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma;    
+dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma;   
 
 !!! Various functions - general use
 
@@ -110,7 +112,9 @@ dec ceiling        : num -> num;
 dec const          : alpha # beta -> alpha;
 dec div, mod       : num # num -> num;
 dec divMod         : num # num -> num # num;
+dec dup            : alpha -> alpha # alpha;
 dec error          : list char -> alpha;
+dec flip           : (alpha # alpha') # (beta # beta') -> (alpha # beta) # (alpha' # beta');
 dec from           : num -> list num;
 dec fst            : alpha # beta -> alpha;
 dec id             : alpha -> alpha;
@@ -127,6 +131,8 @@ dec signum         : num -> num;
 dec snd            : alpha # beta -> beta;
 dec succ           : num -> num; 
 dec truncate       : num -> num;
+dec Ycurry         : (alpha -> alpha) -> alpha;
+dec Yturing        : (alpha -> alpha) -> alpha;
 
 !!! Data conversion functions
 
@@ -226,6 +232,7 @@ private;
 
 !!! General functions
 
+--- x.f <= f(x);
 --- xor (x, y) <= x /= y;
 
 --- n..m <= if n > m 
@@ -308,7 +315,11 @@ private;
 
 --- divMod (n, d) <= (quot (n, d), rem (n, d));
 
+--- dup x <= (x, x);
+
 --- even n <= n mod 2 = 0;
+
+--- flip ((x, x'), (y, y')) <= ((x, y), (x', y'));
 
 --- from n <= if n > 140000
               then error ("Limite maximo de simulacao de infinito: 140000.")
@@ -439,3 +450,7 @@ dec write_element : alpha -> list alpha -> beta;
 dec write_list : list alpha -> beta;
 --- write_list []     <= return;
 --- write_list(x::xs) <= write_element x xs;
+
+--- Ycurry f <= Z Z where Z == \ z => f(z z);
+
+--- Yturing <= Z Z where Z == \ z => \ f => f(z z f);
