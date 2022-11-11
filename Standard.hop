@@ -26,8 +26,8 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 infixr ->, o, /\ : 2;
-infixr #, X      : 4;
-infixr ::, <>    : 5; 
+infixr #, X, U   : 4;
+infixr ::, <>, & : 5; 
 infixr **, ^     : 7; 
 
 infix or               : 1;
@@ -49,6 +49,7 @@ typevar alpha, beta, gamma, delta, epsilon,
 abstype char;  
 abstype neg -> pos;
 abstype pos # pos;
+abstype set pos;
 
 data list alpha == nil ++ alpha :: list alpha;
 data num        == succ num;
@@ -103,6 +104,11 @@ dec +, -, *, /          : num # num -> num;
 dec <>                  : list alpha # list alpha -> list alpha;
 dec =, /=, <, =<, >, >= : alpha # alpha -> truval;
 dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma;   
+dec	&                   : alpha # set alpha -> set alpha;
+dec	card                : set alpha -> num;
+dec	choose              : set alpha -> alpha # set alpha;
+dec	empty               : set alpha;
+dec	U                   : set alpha # set alpha -> set alpha;   
 
 !!! Various functions - general use
 
