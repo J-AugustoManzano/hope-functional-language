@@ -105,8 +105,8 @@ dec +, -, *, /          : num # num -> num;
 dec <>                  : list alpha # list alpha -> list alpha;
 dec =, /=, <, =<, >, >= : alpha # alpha -> truval;
 dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma;   
-dec choose              : set alpha -> alpha # set alpha;
-dec empty               : set alpha;
+dec	choose              : set alpha -> alpha # set alpha;
+dec	empty               : set alpha;
 
 !!! Various functions - general use
 
