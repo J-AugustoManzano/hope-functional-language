@@ -118,6 +118,7 @@ dec flip           : (alpha # alpha') # (beta # beta') -> (alpha # beta) # (alph
 dec from           : num -> list num;
 dec fst            : alpha # beta -> alpha;
 dec id             : alpha -> alpha;
+dec mkpair         : alpha -> beta -> alpha # beta;
 dec negate         : num -> num;
 dec pred           : num -> num; 
 dec properFraction : num -> num # num;
@@ -361,6 +362,8 @@ private;
 --- max (x, y) <= if x > y then x else y;
 
 --- min (x, y) <= if x < y then x else y;
+
+--- mkpair x y <= (x, y);
 
 --- negate (x) <= 0 - x;
 
