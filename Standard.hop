@@ -240,14 +240,15 @@ private;
 
 !!! General functions
 
---- x.f <= f(x);
+--- x . f <= f(x);
+
 --- xor (x, y) <= x /= y;
 
---- n..m <= if n > m 
-            then [] 
-            else if m > 140000
-                 then error ("Limite permitido: 140000.")
-                 else n :: (succ n .. m);
+--- n .. m <= if n > m 
+              then [] 
+              else if m > 140000
+                   then error ("Limite permitido: 140000.")
+                   else n :: (succ n .. m);
                  
 --- (a # b) (x, y) <= (a x, b y);
 
@@ -324,6 +325,8 @@ private;
 --- divMod (n, d) <= (quot (n, d), rem (n, d));
 
 --- dup x <= (x, x);
+
+--- empty <= [];
 
 --- even n <= n mod 2 = 0;
 
