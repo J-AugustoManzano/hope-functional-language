@@ -289,6 +289,8 @@ private;
 --- bool f _ false <= f;
 --- bool _ t true  <= t;
 
+--- choose (x :: xs) <= (x, xs);
+
 --- comp ([], f) <= [];
 --- comp (x :: xs, f) <= if f x 
                          then x :: comp (xs, f)
