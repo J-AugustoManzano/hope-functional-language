@@ -58,6 +58,7 @@ data truval     == false ++ true;
 data void       == Nothing;  
  
 type alpha X beta == alpha # beta;
+type set alpha    == list alpha;
 
 
 
