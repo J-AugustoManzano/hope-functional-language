@@ -5,7 +5,7 @@
 !!!                                                      !!!
 !!! Augusto Manzano (2022) - www.canal.manzano.pro.br    !!!
 !!!                                                      !!!
-!!!                Version 1.0.1 - 2022                  !!!
+!!!                Version 1.0.2 - 2022                  !!!
 !!!                                                      !!!
 !!! This file should be used instead of the original     !!!
 !!! Hope language file on your system.                   !!!
@@ -17,6 +17,9 @@
 !!! purpose. Its original author and the developers who  !!!
 !!! continue the work cannot or may at any time be held  !!!
 !!! responsible.                                         !!!
+!!!                                                      !!!
+!!! Tested only on Windows Operating System with an      !!!
+!!! interpreter coded by Marcos Alfaro.                  !!!
 !!!                                                      !!!
 !!! ---------------------------------------------------- !!!
 
@@ -36,7 +39,7 @@ infix =, /=            : 3;
 infix <, =<, >, >=, .. : 4;
 infix +, -             : 5;
 infix *, /, div, mod   : 6;
-infix .                : 9;
+infix ., @             : 9;
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
@@ -101,22 +104,23 @@ dec **, ^               : num # num -> num;
 dec .                   : alpha # (alpha -> beta) -> beta;
 dec ..                  : num # num -> list num;
 dec /\                  : (alpha -> beta) # (alpha -> beta') -> alpha -> beta # beta';
+dec @                   : list alpha # num -> alpha;
 dec +, -, *, /          : num # num -> num;
 dec <>                  : list alpha # list alpha -> list alpha;
 dec =, /=, <, =<, >, >= : alpha # alpha -> truval;
-dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma;   
-dec	choose              : set alpha -> alpha # set alpha;
-dec	empty               : set alpha;
+dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma; 
 
 !!! Various functions - general use
 
 dec argv           : list (list char);
 dec cbrt           : num -> num;
 dec ceiling        : num -> num;
+dec choose         : set alpha -> alpha # set alpha;
 dec const          : alpha # beta -> alpha;
 dec div, mod       : num # num -> num;
 dec divMod         : num # num -> num # num;
 dec dup            : alpha -> alpha # alpha;
+dec empty          : set alpha;
 dec error          : list char -> alpha;
 dec flip           : (alpha # alpha') # (beta # beta') -> (alpha # beta) # (alpha' # beta');
 dec from           : num -> list num;
@@ -137,7 +141,7 @@ dec snd            : alpha # beta -> beta;
 dec succ           : num -> num; 
 dec truncate       : num -> num;
 dec Ycurry         : (alpha -> alpha) -> alpha;
-dec Yturing        : (alpha -> alpha) -> alpha;
+dec Yturing        : (alpha -> alpha) -> alpha; 
 
 !!! Data conversion functions
 
@@ -148,7 +152,6 @@ dec str2num : list char -> num;
 
 !!! Logic functions - general use
  
-dec afterWith    : (alpha -> truval) -> list alpha -> list alpha;
 dec and          : truval # truval -> truval;  
 dec bool         : alpha -> alpha -> truval -> alpha;
 dec cmp_pair     : (alpha # beta) # (alpha # beta) -> relation;
@@ -160,7 +163,6 @@ dec if_then_else : truval -> alpha -> alpha -> alpha;
 dec not          : truval -> truval;
 dec odd          : num -> truval;
 dec or           : truval # truval -> truval;
-dec span         : (alpha -> truval) -> list alpha -> list alpha # list alpha;
 dec xor          : truval # truval -> truval;
 
 !!! Character conversion
@@ -175,7 +177,7 @@ dec isSpace, isUpper, isXdigit         : char -> truval;
 
 !!! Basic functions
   
-dec abs, ceil, floor       : num -> num;
+dec abs, ceil, fact, floor : num -> num;
 dec erf, erfc              : num -> num;  
 dec exp, log, log10, sqrt  : num -> num;
 dec gcd, lcm, pow, logBase : num # num -> num;
@@ -237,6 +239,9 @@ private;
 
 !!! General functions
 
+--- (x :: xs) @ 0 <= x;
+--- (x :: xs) @ succ n <= xs @ n;
+
 --- x . f <= f(x);
 
 --- xor (x, y) <= x /= y;
@@ -262,11 +267,6 @@ private;
 --- (^) <= pow;
 
 --- (f /\ g) x <= (f x, g x);
-
---- afterWith cond [] <= [];
---- afterWith cond (x::xs) <= if cond x 
-                          then afterWith cond xs 
-                          else x::xs;  
 
 --- acosh (x) <= log (x + sqrt (pow (x, 2) - 1));
 
@@ -328,6 +328,9 @@ private;
 --- empty <= [];
 
 --- even n <= n mod 2 = 0;
+
+--- fact 0 <= 1;
+--- fact(succ n) <= succ n * fact n;
 
 --- flip ((x, x'), (y, y')) <= ((x, y), (x', y'));
 
@@ -428,12 +431,7 @@ dec return : alpha;
 --- round' (n, d) <= if d < 0
                      then error ("Second argument must be positive number.")
                      else ceil (n * pow (10, d)) / pow (10, d);  
-
---- span cond [] <= ([], []);
---- span cond (x::xs) <= if cond x
-                         then (x::f, a) where (f, a) == span cond xs
-                         else ([], x::xs);
-                     
+                   
 --- sign n <= if n < 0 then 0 - 1 else
               if n = 0 then 0 else 1;
 
