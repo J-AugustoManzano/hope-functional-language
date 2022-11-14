@@ -2,8 +2,8 @@
 !                                                                              !
 ! Módulo Hope .........: Prelude.hop                                           !
 !                                                                              !
-! Simulação Haskell ...: Prelude                                               !
-! Versão ..............: 1.0                                                   !
+! Simulação Haskell ...: Prelude/List                                          !
+! Versão ..............: 1.0.1                                                 !
 ! Objetivo ............: Simulação base Haskell em Hope                        !
 ! Copyright ...........: (c) Augusto Manzano, 2022                             !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0 (https://creative !
@@ -11,15 +11,17 @@
 !                                                                              !
 !                        Implementação em Hope das principais funcionalidades  !
 !                        encontradas na linguagem Haskell. Apoio operacional a !
-!                        partir do módulo padrão "Prelude" e outros            !
-!                        Algumas funções do Prelude não estão incluídas neste  !
-!                        arquivo além de um conjunto de funções não existentes !
-!                        em Haskell.                                           !
+!                        partir de algumas operações existentes nos módulos    !
+!                        padrão "Prelude" e "List".                            !
+!                        Algumas funções do Prelude/List não estão incluídas   !
+!                        neste arquivo. Há funções exstentes neste arquivo que !
+!                        não são partes do pacote "Prelude" e "List".          !
 !                                                                              !
 ! Estabilidade ........: Experimental (em desenvolvimento)                     !
-! Dependência .........: Standard.hop (modificada)                             !
+! Dependência .........: Standard.hop (modificada para suporte)                !
+!                        Incluído neste pacote.                                !
 !                                                                              !
-! ---------------------------------------------------------------------------- !   
+! ---------------------------------------------------------------------------- !     
 
 ! !!! -------------------------------------------------------------------- !!! !
 ! !!! SIMULAÇÃO MÓDULO "PRELUDE"                                           !!! !
