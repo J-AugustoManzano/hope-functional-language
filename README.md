@@ -8,4 +8,4 @@ O arquivo "Prelude.hop" tem por objetivo implementar em Hope as principais funci
 
 Material em desenvolvimento (deve ser usado com cautela).
 
-Os testes dos arquivos "Standard.hop" e "Prelude.hop" são realizados, no momento, apenas no sistema operacional Windows. No sistema operacional Linux a implementação atual ainda gera problemas.
+Os testes dos arquivos "Standard.hop" e "Prelude.hop" são realizados, até o momento, apenas no sistema operacional Windows junto a compilação criada por Marcos Alfaro (http://hopelang.blogspot.com/). No sistema operacional Linux a implementação atual ainda gera problemas.
