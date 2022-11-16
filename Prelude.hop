@@ -454,7 +454,7 @@ zipWith3 (f, a :: ax, b :: bx, c :: cx) <= f (a, b, c) :: zipWith3 (f, ax, bx, c
 
 
 ! !!! Funcionalidades auxiliares/extras - Haskell e nao Haskell
-! !!! Dependendentes de funcoes da secao anterior
+! !!! dependendentes de funcoes da secao anterior.
 ! !!! =========================================================
 
 diagonal : list alpha # list beta # list beta -> list (alpha # beta);
