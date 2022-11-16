@@ -5,7 +5,7 @@
 !!!                                                      !!!
 !!! Augusto Manzano (2022) - www.canal.manzano.pro.br    !!!
 !!!                                                      !!!
-!!!                Version 1.0.2 - 2022                  !!!
+!!!                Version 2.0.0 - 2022                  !!!
 !!!                                                      !!!
 !!! This file should be used instead of the original     !!!
 !!! Hope language file on your system.                   !!!
@@ -129,13 +129,16 @@ dec fst            : alpha # beta -> alpha;
 dec id             : alpha -> alpha;
 dec mkpair         : alpha -> beta -> alpha # beta;
 dec negate         : num -> num;
+dec recip          : num -> num;
 dec pred           : num -> num; 
 dec properFraction : num -> num # num;
 dec quot           : num # num -> num; 
+dec quotRem        : num # num -> (num # num);
 dec read           : list char -> list char;
 dec rem            : num # num -> num;
 dec round          : num -> num;
 dec round'         : num # num -> num;
+dec seq            : alpha # beta -> beta;
 dec sign           : num -> num; 
 dec signum         : num -> num; 
 dec snd            : alpha # beta -> beta;
@@ -178,11 +181,11 @@ dec isSpace, isUpper, isXdigit         : char -> truval;
 
 !!! Basic functions
   
-dec abs, ceil, fact, floor : num -> num;
-dec erf, erfc              : num -> num;  
-dec exp, log, log10, sqrt  : num -> num;
-dec gcd, lcm, pow, logBase : num # num -> num;
-dec max, min               : alpha # alpha -> alpha;
+dec abs, ceil, fact, floor    : num -> num;
+dec erf, erfc, erfcx, normcdf : num -> num;  
+dec exp, log, log10, sqrt     : num -> num;
+dec gcd, lcm, pow, logBase    : num # num -> num;
+dec max, min                  : alpha # alpha -> alpha;
 
 !!! Trigonometric functions (radians)
 
@@ -330,6 +333,25 @@ private;
 
 --- even n <= n mod 2 = 0;
 
+--- erf (0) <= 0; ! error is less than 1.2 * 10^-7 for all inputs
+--- erf (x) <= 1 - t * exp ((0 - x) * x - 1.26551223 +
+                   t * (    1.00002368 +
+                   t * (    0.37409196 + 
+                   t * (    0.09678418 + 
+                   t * (0 - 0.18628806 + 
+                   t * (    0.27886807 + 
+                   t * (0 - 1.13520398 + 
+                   t * (    1.48851587 + 
+                   t * (0 - 0.82215223 + 
+                   t * (    0.17087277))))))))))
+             where t == 1 / (1 + 0.5 * abs (x));
+!!! erf = https://www.johndcook.com/blog/haskell-erf/
+        
+--- erfc (0) <= 1;
+--- erfc (x) <= 1 - erf x;   
+
+--- erfcx (x) <= exp (pow (x, 2)) * erfc x;
+
 --- fact 0 <= 1;
 --- fact(succ n) <= succ n * fact n;
 
@@ -380,6 +402,8 @@ private;
 
 --- negate (x) <= 0 - x;
 
+--- normcdf (x) <= erfc (0 - x / sqrt 2) / 2;
+
 --- not true  <= false;
 --- not false <= true;
 
@@ -392,6 +416,8 @@ private;
                                where r == x - floor x; 
 
 --- quot (n, d) <= n div d;
+
+--- quotRem (a, b) <= (a div b, a mod b);
                            
 --- sec x <= 1 / cos x;
 
@@ -418,6 +444,9 @@ private;
 dec print : alpha -> beta;	
 !!! print x <= return;		
 
+--- recip (x) <= 1 / x;
+--- x / y <= x * recip y;
+
 --- rem (n, d) <= n mod d;
 
 dec return : alpha;		
@@ -432,6 +461,8 @@ dec return : alpha;
 --- round' (n, d) <= if d < 0
                      then error ("Second argument must be positive number.")
                      else ceil (n * pow (10, d)) / pow (10, d);  
+
+--- seq (_, y) <= y;    
                    
 --- sign n <= if n < 0 then 0 - 1 else
               if n = 0 then 0 else 1;
