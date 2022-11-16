@@ -2,8 +2,8 @@
 !                                                                              !
 ! Módulo Hope .........: Prelude.hop                                           !
 !                                                                              !
-! Simulação Haskell ...: Prelude/List                                          !
-! Versão ..............: 1.0.1                                                 !
+! Simulação Haskell ...: Prelude/Data.List/List                                !
+! Versão ..............: 2.0.0                                                 !
 ! Objetivo ............: Simulação base Haskell em Hope                        !
 ! Copyright ...........: (c) Augusto Manzano, 2022                             !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0 (https://creative !
@@ -12,20 +12,108 @@
 !                        Implementação em Hope das principais funcionalidades  !
 !                        encontradas na linguagem Haskell. Apoio operacional a !
 !                        partir de algumas operações existentes nos módulos    !
-!                        padrão "Prelude" e "List".                            !
+!                        padrão "Prelude", "Data.List" e "List".               !
 !                        Algumas funções do Prelude/List não estão incluídas   !
 !                        neste arquivo. Há funções exstentes neste arquivo que !
-!                        não são partes do pacote "Prelude" e "List".          !
+!                        não são partes dos pacotes Haskell.                   !
+!                                                                              !
+!                        Algumas funções existentes no Prelude já fazem parte  !
+!                        da biblioteca "Standard.hop" sendo comuns a uma lin-  !
+!                        guagem funcional. Há alguns ajustes feitos no arquivo !
+!                        "Standard.hop" aqui disponibilizado que deve substi-  !
+!                        tuir o arquivo original.                              !
+!                                                                              !
+!                        Este projeto de funcionalidades foi escrito da manei- !
+!                        ra mais simplista possível utilizando-se alguns dos   !
+!                        principais recursos básicos da linguagem Hope.        !
 !                                                                              !
 ! Estabilidade ........: Experimental (em desenvolvimento)                     !
 ! Dependência .........: Standard.hop (modificada para suporte)                !
 !                        Incluído neste pacote.                                !
 !                                                                              !
-! ---------------------------------------------------------------------------- !     
+! ---------------------------------------------------------------------------- !   
 
 ! !!! -------------------------------------------------------------------- !!! !
-! !!! SIMULAÇÃO MÓDULO "PRELUDE"                                           !!! !
+! !!! SIMULAÇÃO "PRELUDE", "DATA.LIST" e "LIST" COM AJUSTES                !!! !
 ! !!! -------------------------------------------------------------------- !!! !
+
+
+
+! !!! Operadores auxiliares
+! !!! =====================
+
+infixr || : 2;
+dec || : list (alpha) # list (beta) -> list (alpha # beta);
+--- [] || ys <= [];
+--- xs || [] <= [];
+--- x::xs || y::ys <= (x, y) :: (xs || ys);
+
+infixr \\ : 3;
+dec \\ : list alpha # list beta -> list (alpha # beta);
+
+
+
+! !!! Funcionalidades auxiliares/extras - nao Haskell
+! !!! ===============================================
+
+afterWith : (alpha -> truval) -> list alpha -> list alpha;
+afterWith cond [] <= [];
+afterWith cond (x :: xs) <= if cond x 
+                            then afterWith cond xs 
+                            else x :: xs;
+
+comp : list alpha # (alpha -> truval) -> list alpha;
+comp ([], f) <= [];
+comp (x :: xs, f) <= if f x 
+                     then x :: comp (xs, f)
+                     else comp (xs, f);
+                     
+dist : alpha # list beta -> list (alpha # beta);
+dist (x, []) <= [];
+dist (x, y :: ys) <= (x, y) :: dist (x, ys);
+
+front : num # list alpha -> list alpha;
+front (0, xs) <= [];
+front (n, []) <= [];
+front (succ n, x :: xs) <= x :: front(n, xs);
+
+front_with : (alpha -> truval) -> list alpha -> list alpha;
+front_with cond [] <= [];
+front_with cond (x :: xs) <= if cond x 
+                             then x :: front_with cond xs 
+                             else [];
+
+listPow : num # list num -> list num;
+listPow (_, [])      <= [];
+listPow (n, x :: xs) <= pow (x, n) :: listPow (n, xs);
+
+many : alpha -> list alpha;
+many x <= xs whererec xs == x :: xs;
+
+partition : (alpha -> truval) # list alpha -> list alpha # list alpha;
+partition (f, []) <= ([], []);
+partition (f, x :: xs) <= if f x 
+                             then (x :: ayes, nayes) 
+                             else (ayes, x :: nayes)
+	                         where (ayes, nayes) == partition (f, xs);
+	                         
+rangeLst : num # num # num -> list num;
+rangeLst (i, f, p) <= if i > f 
+                      then [] 
+                      else i :: rangeLst (i + p, f, p);
+                      
+scan : beta # (beta # alpha -> beta) -> list alpha -> list beta;
+scan (c, f) <= (c ::) o (\ [] => [] | x :: xs => scan (f (c, x), f) xs);
+
+
+
+! !!! Funcionalidades Prelude: Haskell
+! !!! ================================
+
+after : num # list alpha -> list alpha;
+after (0, xs) <= xs;
+after (n, []) <= [];
+after (succ n, x :: xs) <= after (n, xs);
 
 all : (alpha -> truval) # list alpha -> truval;
 all (_, [])      <= true;
@@ -35,9 +123,19 @@ any : (alpha -> truval) # list alpha -> truval;
 any (_, [])      <= false;
 any (p, x :: xs) <= p x or any (p, xs); 
 
-!!!!! break
+break : (alpha -> truval) # list alpha -> (list alpha # list alpha);
+break (f, []) <= ([], []);
+break (f, x :: xs) <= if f x
+                      then ([], x :: xs)
+                      else let (ys, zs) == break (f, xs) in (x :: ys, zs);
 
-!!!!! compare
+
+compare : alpha # alpha -> relation;
+compare (x, y) <= if x = y
+                  then EQUAL
+                  else if x =< y
+                       then LESS
+                       else GREATER;
 
 concat : list (list alpha) -> list alpha;
 concat []        <= [];
@@ -50,7 +148,7 @@ concatMap (f, x :: xs) <= f x <> concatMap (f, xs);
 !! >> [3, 5, 7] : list num
 
 curry : (alpha # beta -> gamma) -> alpha -> beta -> gamma;
-curry f <= lambda x => lambda y => f(x, y);
+curry f <= \ x => \ y => f(x, y);
 !! >: curry fst 2 3;
 !! >> 2 : num
 
@@ -72,15 +170,6 @@ dropWhile (p, x :: xs) <= if p x
 elem : alpha # list alpha -> truval;
 elem (x, [])      <= false;
 elem (x, y :: ys) <= x = y or elem (x, ys);
-
-member : alpha # list alpha -> truval;
-member <= elem;    
-
-unique : list alpha -> list alpha;
-unique []        <= [];
-unique (x :: xs) <= if member (x, xs) 
-                    then unique xs 
-                    else x :: unique xs;     
 
 filter : (alpha -> truval) # list alpha -> list alpha;
 filter (_, [])      <= [];
@@ -110,6 +199,11 @@ head : list alpha -> alpha;
 head []       <= error ("Empty list!");
 head (x :: _) <= x;
 
+index : num # list num -> num;
+index (_, []) <= error "Index out of range!";
+index (0, x :: xs) <= x;
+index (n, x :: xs) <= index (n - 1, xs);
+
 init : list alpha -> list alpha;
 init ([x])     <= [];
 init (x :: xs) <= x :: init xs;
@@ -127,9 +221,10 @@ intersperse (n, x :: xs) <= x :: n :: intersperse (n, xs);
 !! >: intersperse (0, [1, 2, 3, 4, 5]);
 !! >> [1, 0, 2, 0, 3, 0, 4, 0, 5] : list num
 
-sort : list alpha -> list alpha;
-sort []        <= [];
-sort (x :: xs) <= insert (x, sort xs);
+iterate : (alpha -> alpha) # alpha -> list alpha;
+iterate (f, x) <= x :: iterate (f, f x);
+!! >: take (10, (iterate (\x => x * 2, 1)));
+!! >> [1, 2, 4, 8, 16, 32, 64, 128, 256, 512] : list num
 
 last : list alpha -> alpha;
 last ([x])     <= x;
@@ -139,16 +234,18 @@ length : list alpha -> num;
 length []        <= 0;
 length (x :: xs) <= 1 + length xs;
 
-listPow : num # list num -> list num;
-listPow (_, [])      <= [];
-listPow (n, x :: xs) <= pow (x, n) :: listPow (n, xs);
-
 getPos : alpha # list alpha -> num;
 getPos (_, [])      <= error ("Element does not exist in the list!");
 getPos (n, x :: xs) <= if n = x 
                        then length xs 
                        else getPos (n, xs);
-
+                       
+lines : list char -> list (list char);
+lines [] <= [];
+lines (x :: xs) <= if x = '\n' 
+                   then [] :: lines xs 
+                   else (\ [] => [[x]] | y :: ys => (x :: y) :: ys) (lines xs);
+                       
 lookup : alpha # list (alpha # beta) -> beta;
 lookup (_, []) <= error "Data not found!";
 lookup (k, ((x, y) :: xyz)) <= if k = x
@@ -161,12 +258,18 @@ map : (alpha -> beta) # list alpha -> list beta;
 map (_, [])      <= [];
 map (f, x :: xs) <= f x :: map (f, xs);
 
+inits : list alpha -> list(list alpha);
+inits <= ([] ::) o (\ [] => [] | x :: xs => map ((x ::), inits xs));
+
 maximum : list alpha -> alpha;
 maximum []             <= error ("Empty list!");
 maximum ([x])          <= x;
 maximum (x :: y :: xs) <= if x > y 
                           then maximum (x :: xs) 
                           else maximum (y :: xs);
+
+member : alpha # list alpha -> truval;
+member <= elem;    
 
 minimum : list alpha -> alpha;
 minimum []             <= error ("Empty list!");
@@ -189,67 +292,40 @@ print n <= n;
 product : list num -> num;
 product xs <= foldl ((*), 1, xs);
 
-quotRem : num # num -> (num # num);
-quotRem (a, b) <= (a div b, a mod b);
-
-range : num # num # num -> list num;
-range (i, f, p) <= if i > f 
-                   then [] 
-                   else i :: range (i + p, f, p);
-
 reduce : list alpha # (alpha # alpha -> alpha) # alpha -> alpha;
 reduce ([], f, n)      <= n;
 reduce (x :: xs, f, n) <= f (x, reduce (xs, f, n));
 
 reverseAux : list alpha # list alpha -> list alpha;
-reverseAux([], ys)    <= ys;
-reverseAux(x::xs, ys) <= reverseAux(xs, x::ys);
+reverseAux ([], ys)    <= ys;
+reverseAux (x :: xs, ys) <= reverseAux (xs, x::ys);
 
 reverse : list alpha -> list alpha;
-reverse xs <= reverseAux(xs, []);
-
-find : alpha # list alpha -> num;
-find (_, [])      <= error ("Empty list!");
-find (n, x :: xs) <= getPos (n, reverse (x :: xs));
-
-scanl : (beta # alpha -> beta) # beta # list alpha -> list beta;
-scanl (_, n, []) <= [n];
-scanl (f, n, x :: xs) <= n :: scanl (f, f (n, x), xs);
-
-scanl1 : (alpha #alpha -> alpha) # list alpha -> list alpha;
-scanl1 (_, []) <= [];
-scanl1 (f, x :: xs) <= scanl (f, x, xs);
-
-!!!!! scanr
-
-!!!!! scanr1
-
-take : num # list alpha -> list alpha;
-take (n, [])      <= [];
-take (0, xs)      <= [];
-take (n, x :: xs) <= x :: take (n - 1, xs);
-
-iterate : (alpha -> alpha) # alpha -> list alpha;
-iterate (f, x) <= x :: iterate (f, f x);
-!! >: take (10, (iterate (\x => x * 2, 1)));
-!! >> [1, 2, 4, 8, 16, 32, 64, 128, 256, 512] : list num
+reverse xs <= reverseAux (xs, []);
 
 repeat : alpha -> list alpha;
 repeat x <= x :: repeat x;
 
-replicate : num # alpha -> list alpha;
-replicate (n, x) <= take (n, repeat x);
+remove : alpha # list alpha -> list alpha;
+remove (x, ys) <= filter ((/= x), ys);
 
-splitAt : num # list alpha -> list alpha # list alpha;
-splitAt (n, xs) <= (take (n, xs), drop (n, xs));
+rotl : list alpha -> list alpha;
+rotl [] <= [];
+rotl (x::xs) <= xs <> [x];
 
-splitAt' : num # list alpha -> list alpha # list alpha;
-splitAt' (0, ys)      <= ([], ys);
-splitAt' (_, [])      <= ([], []);
-splitAt' (n, y :: ys) <= if n < 0 
-                         then ([], y :: ys) 
-                         else (y :: a, b) 
-                         where (a, b) == splitAt' (n - 1, ys);  
+rotr : list alpha -> list alpha;
+rotr [] <= [];
+rotr xs <= last xs :: init xs;
+
+sort : list alpha -> list alpha;
+sort []        <= [];
+sort (x :: xs) <= insert (x, sort xs);
+
+span : (alpha -> truval) # list alpha -> list alpha # list alpha;
+span (f, []) <= ([], []);
+span (f, x :: xs) <= if f x
+                     then (x :: f, a) where (f, a) == span (f, xs)
+                     else ([], x :: xs);
 
 subtract : num # num -> num;
 subtract (x, y) <= y - x;
@@ -258,9 +334,38 @@ sum : list num -> num;
 sum []        <= 0;
 sum (x :: xs) <= x + sum xs;  
 
+scanl : (beta # alpha -> beta) # beta # list alpha -> list beta;
+scanl (_, n, []) <= [n];
+scanl (f, n, x :: xs) <= n :: scanl (f, f (n, x), xs);
+
+scanl1 : (alpha # alpha -> alpha) # list alpha -> list alpha;
+scanl1 (_, []) <= [];
+scanl1 (f, x :: xs) <= scanl (f, x, xs);
+
+scanr : (alpha # beta -> beta) # beta # list alpha -> list beta;
+scanr (_, n, []) <= [n];
+scanr (f, n, x :: xs) <= f (x, head ys) :: ys 
+                         where ys == scanr (f, n, xs);
+
+scanr1 : (alpha # alpha -> alpha) # list alpha -> list alpha;
+scanr1 (_, []) <= [];
+scanr1 (_, [x]) <= [x];
+scanr1 (f, x :: xs) <= f (x, head ys) :: ys where ys == scanr1 (f, xs);
+
+take : num # list alpha -> list alpha;
+take (n, [])      <= [];
+take (0, xs)      <= [];
+take (n, x :: xs) <= x :: take (n - 1, xs);
+
 tail : list alpha -> list alpha;
 tail []        <= error ("Empty list!");
 tail (_ :: xs) <= xs;
+
+tails : list alpha -> list (list alpha);
+  proper_tails : list alpha -> list (list alpha);
+  proper_tails [] <= [];
+  proper_tails (x :: xs) <= tails xs;
+tails l <= l :: proper_tails l;
 
 takeWhile : (alpha -> truval) # list alpha -> list alpha;
 takeWhile (_, [])      <= [];
@@ -270,6 +375,10 @@ takeWhile (p, x :: xs) <= if p x
 
 uncurry : (alpha -> beta -> gamma) -> alpha # beta -> gamma;
 uncurry f (x, y) <= f x y;
+
+unlines : list (list char) -> list char;
+unlines [] <= [];
+unlines (x :: xs) <= x <> '\n' :: unlines xs;
 
 until : (alpha -> truval) # (alpha -> alpha) # alpha -> alpha;
 until (p, f, x) <= if p x 
@@ -310,7 +419,7 @@ unzip3 xs <= unzipAux3 ([], [], [], xs);
 words : list char -> list (list char);
   wordsAux : list char -> list(list char);
   wordsAux "" <= [];
-  wordsAux cs <= w :: words rest where (w, rest) == span (not o isSpace) cs;
+  wordsAux cs <= w :: words rest where (w, rest) == span (not o isSpace, cs);
 words cs <= wordsAux (afterWith isSpace cs);
 
 zip : list alpha # list beta -> list (alpha # beta);
@@ -341,3 +450,38 @@ zipWith3 (_, _, _) <= [];
 zipWith3 (f, a :: ax, b :: bx, c :: cx) <= f (a, b, c) :: zipWith3 (f, ax, bx, cx);
 !! :> zipWith3 ((\x, y, z => x+2*y+3*z), 1..5, 5..10, 10..15);
 !! >> [41, 47, 53, 59, 65] : list num
+
+
+
+! !!! Funcionalidades auxiliares/extras - Haskell e nao Haskell
+! !!! Dependendentes de funcoes da secao anterior
+! !!! =========================================================
+
+diagonal : list alpha # list beta # list beta -> list (alpha # beta);
+diagonal (xs, rev_ys, y :: ys) <= (xs || y :: rev_ys) <> diagonal (xs, y :: rev_ys, ys);
+diagonal (xs, rev_ys, []) <= concat (map ((|| rev_ys), (tails (tail xs))));
+xs \\ ys <= diagonal (xs, [], ys);
+
+find : alpha # list alpha -> num;
+find (_, [])      <= error ("Empty list!");
+find (n, x :: xs) <= getPos (n, reverse (x :: xs));
+
+replicate : num # alpha -> list alpha;
+replicate (n, x) <= take (n, repeat x);
+
+splitAt : num # list alpha -> list alpha # list alpha;
+splitAt (n, xs) <= (take (n, xs), drop (n, xs));
+
+splitAt' : num # list alpha -> list alpha # list alpha;
+splitAt' (0, ys)      <= ([], ys);
+splitAt' (_, [])      <= ([], []);
+splitAt' (n, y :: ys) <= if n < 0 
+                         then ([], y :: ys) 
+                         else (y :: a, b) 
+                         where (a, b) == splitAt' (n - 1, ys);  
+
+unique : list alpha -> list alpha;
+unique []        <= [];
+unique (x :: xs) <= if member (x, xs) 
+                    then unique xs 
+                    else x :: unique xs;
