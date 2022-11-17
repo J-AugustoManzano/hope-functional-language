@@ -5,7 +5,7 @@
 !!!                                                      !!!
 !!! Augusto Manzano (2022) - www.canal.manzano.pro.br    !!!
 !!!                                                      !!!
-!!!                Version 2.0.0 - 2022                  !!!
+!!!                Version 2.0.1 - 2022                  !!!
 !!!                                                      !!!
 !!! This file should be used instead of the original     !!!
 !!! Hope language file on your system.                   !!!
@@ -29,10 +29,10 @@
 !!! >>> infix/infixr operators                       <<< !!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-infixr ->, o, /\ : 2;
-infixr #, X, U   : 4;
-infixr ::, <>, & : 5; 
-infixr **, ^     : 7; 
+infixr ->, o, /\, || : 2;
+infixr #, X, U       : 4;
+infixr ::, <>, &     : 5; 
+infixr **, ^         : 7; 
 
 infix or               : 1;
 infix and              : 2; 
@@ -110,6 +110,9 @@ dec +, -, *, /          : num # num -> num;
 dec <>                  : list alpha # list alpha -> list alpha;
 dec =, /=, <, =<, >, >= : alpha # alpha -> truval;
 dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma; 
+dec ||                  : list (alpha) # list (beta) -> list (alpha # beta);
+
+
 
 !!! Various functions - general use
 
@@ -171,13 +174,16 @@ dec xor          : truval # truval -> truval;
 
 !!! Character conversion
 
-dec toLower, toUpper : char -> char;     
+dec toLower, toUpper : char -> char; 
+dec digitToInt       : char -> num;    
+dec intToDigit       : num -> char;    
 
 !!! Logic functions - classification functions
 
-dec isAlnum, isAlpha, isAscii, isCtrl  : char -> truval;
-dec isDigit, isGraph, isLower, isPunct : char -> truval;
-dec isSpace, isUpper, isXdigit         : char -> truval;  
+dec isAlnum,    isAlpha, isAscii,    isCtrl  : char -> truval;
+dec isDigit,    isGraph, isHexDigit, isLower : char -> truval;
+dec isOctDigit, isPunct, isSpace,    isUpper : char -> truval;
+dec isXdigit                                 : char -> truval;  
 
 !!! Basic functions
   
@@ -272,6 +278,10 @@ private;
 
 --- (f /\ g) x <= (f x, g x);
 
+--- [] || ys <= [];
+--- xs || [] <= [];
+--- x::xs || y::ys <= (x, y) :: (xs || ys);
+
 --- acosh (x) <= log (x + sqrt (pow (x, 2) - 1));
 
 --- asinh (x) <= log (x + sqrt (pow (x, 2) + 1));
@@ -327,6 +337,12 @@ private;
 
 --- divMod (n, d) <= (quot (n, d), rem (n, d));
 
+--- digitToInt c <= if isAlnum c and ord c > 47 and ord c < 58
+                    then ord c - 48
+                    else if ord (toUpper c) > 64 and ord (toUpper c) < 71
+                         then ord (toUpper c) - 55
+                         else error("not a digit");
+                      
 --- dup x <= (x, x);
 
 --- empty <= [];
@@ -366,21 +382,35 @@ private;
 --- gcd (0, n) <= n;
 --- gcd (m, n) <= gcd (floor n mod floor m, m);
 
+--- intToDigit n <= if n >= 0 and n < 10
+                    then chr (n + 48)
+                    else if n > 9 and n < 16
+                         then chr (n + 55)
+                         else error("not a digit");
+                         
 --- isAlnum c <= isAlpha c or isDigit c;
 
 --- isAlpha c <= isUpper c or isLower c;
 
 --- isAscii c <= ord c < 128;
 
---- isCtrl c <= isAscii c and not(isGraph c);
+--- isCtrl c <= isAscii c and not (isGraph c);
 
 --- isDigit c <= '0' =< c and c =< '9';
 
+--- isHexDigit c <= if isAlnum c and ord c > 47 and ord c < 58
+                    then true
+                    else if ord (toUpper c) > 64 and ord (toUpper c) < 71
+                         then true
+                         else false;
+                         
 --- isGraph c <= ' ' =< c and c =< '~';
 
 --- isLower c <= 'a' =< c and c =< 'z';
 
 --- isPunct c <= isGraph c and c /= ' ' and not(isAlnum c);
+
+--- isOctDigit c <= isAlnum c and ord c > 47 and ord c < 56;
 
 --- isSpace c <= c = ' ' or c = '\t' or c = '\n';
 
