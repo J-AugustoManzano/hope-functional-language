@@ -3,7 +3,7 @@
 ! Módulo Hope .........: Prelude.hop                                           !
 !                                                                              !
 ! Simulação Haskell ...: Prelude/Data.List/List                                !
-! Versão ..............: 2.0.0                                                 !
+! Versão ..............: 2.0.1                                                 !
 ! Objetivo ............: Simulação base Haskell em Hope                        !
 ! Copyright ...........: (c) Augusto Manzano, 2022                             !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0 (https://creative !
@@ -42,12 +42,6 @@
 ! !!! Operadores auxiliares
 ! !!! =====================
 
-infixr || : 2;
-dec || : list (alpha) # list (beta) -> list (alpha # beta);
---- [] || ys <= [];
---- xs || [] <= [];
---- x::xs || y::ys <= (x, y) :: (xs || ys);
-
 infixr \\ : 3;
 dec \\ : list alpha # list beta -> list (alpha # beta);
 
@@ -55,6 +49,11 @@ dec \\ : list alpha # list beta -> list (alpha # beta);
 
 ! !!! Funcionalidades auxiliares/extras - nao Haskell
 ! !!! ===============================================
+
+after : num # list alpha -> list alpha;
+after (0, xs) <= xs;
+after (n, []) <= [];
+after (succ n, x :: xs) <= after (n, xs);
 
 afterWith : (alpha -> truval) -> list alpha -> list alpha;
 afterWith cond [] <= [];
@@ -83,6 +82,8 @@ front_with cond (x :: xs) <= if cond x
                              then x :: front_with cond xs 
                              else [];
 
+!!!!! group
+
 listPow : num # list num -> list num;
 listPow (_, [])      <= [];
 listPow (n, x :: xs) <= pow (x, n) :: listPow (n, xs);
@@ -90,13 +91,6 @@ listPow (n, x :: xs) <= pow (x, n) :: listPow (n, xs);
 many : alpha -> list alpha;
 many x <= xs whererec xs == x :: xs;
 
-partition : (alpha -> truval) # list alpha -> list alpha # list alpha;
-partition (f, []) <= ([], []);
-partition (f, x :: xs) <= if f x 
-                             then (x :: ayes, nayes) 
-                             else (ayes, x :: nayes)
-	                         where (ayes, nayes) == partition (f, xs);
-	                         
 rangeLst : num # num # num -> list num;
 rangeLst (i, f, p) <= if i > f 
                       then [] 
@@ -105,15 +99,15 @@ rangeLst (i, f, p) <= if i > f
 scan : beta # (beta # alpha -> beta) -> list alpha -> list beta;
 scan (c, f) <= (c ::) o (\ [] => [] | x :: xs => scan (f (c, x), f) xs);
 
+span : (alpha -> truval) # list alpha -> list alpha # list alpha;
+span (f, []) <= ([], []);
+span (f, x :: xs) <= if f x
+                     then (x :: f, a) where (f, a) == span (f, xs)
+                     else ([], x :: xs);
 
 
 ! !!! Funcionalidades Prelude: Haskell
 ! !!! ================================
-
-after : num # list alpha -> list alpha;
-after (0, xs) <= xs;
-after (n, []) <= [];
-after (succ n, x :: xs) <= after (n, xs);
 
 all : (alpha -> truval) # list alpha -> truval;
 all (_, [])      <= true;
@@ -156,6 +150,15 @@ cycle : list num -> list num;
 cycle [] <= error ("Lista vazia!");
 cycle (x :: xs) <= x :: cycle (xs <> [x]);
 
+deleteBy : (alpha # alpha -> truval) # alpha # list alpha -> list alpha;
+deleteBy (_, _, []) <= [];
+deleteBy (f, x, y :: ys) <= if f (x, y) 
+                            then ys 
+                            else y :: deleteBy (f, x, ys);
+                            
+delete : alpha # list alpha -> list alpha;
+delete (n, xs) <= deleteBy ((=), n, xs);                            
+                            
 drop : num # list alpha -> list alpha;
 drop (0, xs)      <= xs;
 drop (n, [])      <= [];
@@ -170,6 +173,17 @@ dropWhile (p, x :: xs) <= if p x
 elem : alpha # list alpha -> truval;
 elem (x, [])      <= false;
 elem (x, y :: ys) <= x = y or elem (x, ys);
+
+equalityAux : list alpha # list alpha -> truval;
+equalityAux ([], []) <= true;
+equalityAux ([], b) <= true;
+equalityAux (a, []) <= false;
+equalityAux (a :: ax, b) <= if elem (a, b)
+                            then equalityAux (ax, b)
+                            else false;
+
+equality : list alpha # list alpha -> truval;
+equality (a, b) <= equalityAux (a, b) and equalityAux (b, a);
 
 filter : (alpha -> truval) # list alpha -> list alpha;
 filter (_, [])      <= [];
@@ -214,6 +228,12 @@ insert (n, x :: xs) <= if n =< x
                        then n :: x :: xs 
                        else x :: insert (n, xs);
 
+intersect : list alpha # list alpha -> list alpha;
+intersect ([], _) <= [];
+intersect (x :: xs, lst) <= if elem (x, lst)
+                            then x :: intersect (xs, lst)
+                            else intersect (xs, lst);
+                            
 intersperse : alpha # list alpha -> list alpha;
 intersperse  (_, []) <= [];
 intersperse  (_, [x]) <= [x];
@@ -271,12 +291,26 @@ maximum (x :: y :: xs) <= if x > y
 member : alpha # list alpha -> truval;
 member <= elem;    
 
+merge : list alpha # list alpha -> list alpha;
+merge ([], []) <= [];
+merge (a, []) <= a;
+merge ([], b) <= b;
+merge (a :: ax, b) <= a :: merge (ax, b);
+
 minimum : list alpha -> alpha;
 minimum []             <= error ("Empty list!");
 minimum ([x])          <= x;
 minimum (x :: y :: xs) <= if x < y 
                           then minimum (x :: xs) 
                           else minimum (y :: xs);
+
+nub : list alpha -> list alpha;
+nub [] <= [];
+nub (x :: xs) <= x :: filter ((/= x), nub xs);
+
+notElem : alpha # list alpha -> truval;
+notElem (_, []) <= true;
+notElem (x, y :: ys) <= x /= y and notElem (x, ys);
 
 null : list alpha -> truval;
 null []       <= true;
@@ -289,6 +323,13 @@ print n <= n;
 !! >: print [1,2,3]<>[4,5];
 !! >> [1, 2, 3, 4, 5] : list num
 
+partition : (alpha -> truval) # list alpha -> list alpha # list alpha;
+partition (f, []) <= ([], []);
+partition (f, x :: xs) <= if f x 
+                             then (x :: ayes, nayes) 
+                             else (ayes, x :: nayes)
+	                         where (ayes, nayes) == partition (f, xs);
+	                         
 product : list num -> num;
 product xs <= foldl ((*), 1, xs);
 
@@ -296,18 +337,18 @@ reduce : list alpha # (alpha # alpha -> alpha) # alpha -> alpha;
 reduce ([], f, n)      <= n;
 reduce (x :: xs, f, n) <= f (x, reduce (xs, f, n));
 
+remove : alpha # list alpha -> list alpha;
+remove (x, ys) <= filter ((/= x), ys);
+
+repeat : alpha -> list alpha;
+repeat x <= x :: repeat x;
+
 reverseAux : list alpha # list alpha -> list alpha;
 reverseAux ([], ys)    <= ys;
 reverseAux (x :: xs, ys) <= reverseAux (xs, x::ys);
 
 reverse : list alpha -> list alpha;
 reverse xs <= reverseAux (xs, []);
-
-repeat : alpha -> list alpha;
-repeat x <= x :: repeat x;
-
-remove : alpha # list alpha -> list alpha;
-remove (x, ys) <= filter ((/= x), ys);
 
 rotl : list alpha -> list alpha;
 rotl [] <= [];
@@ -317,15 +358,14 @@ rotr : list alpha -> list alpha;
 rotr [] <= [];
 rotr xs <= last xs :: init xs;
 
-sort : list alpha -> list alpha;
-sort []        <= [];
-sort (x :: xs) <= insert (x, sort xs);
+sortAux : list alpha # list alpha -> list alpha;
+sortAux ([], ys) <= ys;
+sortAux (x :: xs, ys) <=
+	sortAux (smaller, x :: sortAux (larger, ys))
+	where (smaller, larger) == partition ((< x), xs);
 
-span : (alpha -> truval) # list alpha -> list alpha # list alpha;
-span (f, []) <= ([], []);
-span (f, x :: xs) <= if f x
-                     then (x :: f, a) where (f, a) == span (f, xs)
-                     else ([], x :: xs);
+dec sort : list alpha -> list alpha;
+--- sort xs <= sortAux (xs, []);
 
 subtract : num # num -> num;
 subtract (x, y) <= y - x;
@@ -352,6 +392,8 @@ scanr1 (_, []) <= [];
 scanr1 (_, [x]) <= [x];
 scanr1 (f, x :: xs) <= f (x, head ys) :: ys where ys == scanr1 (f, xs);
 
+!!!!! sort
+
 take : num # list alpha -> list alpha;
 take (n, [])      <= [];
 take (0, xs)      <= [];
@@ -373,8 +415,16 @@ takeWhile (p, x :: xs) <= if p x
                           then x :: takeWhile (p, xs) 
                           else [];
 
+transpose : list (list alpha) -> list (list alpha);
+transpose [[]] <= [];
+transpose ([]::_) <= [];
+transpose x <= (map (head, x)) :: transpose (map (tail, x));
+
 uncurry : (alpha -> beta -> gamma) -> alpha # beta -> gamma;
 uncurry f (x, y) <= f x y;
+
+union : list alpha # list alpha -> list alpha;
+union (a, b) <= sort (nub (merge (a, b)));
 
 unlines : list (list char) -> list char;
 unlines [] <= [];
@@ -462,9 +512,20 @@ diagonal (xs, rev_ys, y :: ys) <= (xs || y :: rev_ys) <> diagonal (xs, y :: rev_
 diagonal (xs, rev_ys, []) <= concat (map ((|| rev_ys), (tails (tail xs))));
 xs \\ ys <= diagonal (xs, [], ys);
 
+diference : list num # list num -> list num;
+diference (a, []) <= a;
+diference ([], b) <= [];
+diference (a :: ax, b) <= if elem (a, b) 
+                          then diference (ax, b) 
+                          else a :: diference (ax, b);
+                          
 find : alpha # list alpha -> num;
 find (_, [])      <= error ("Empty list!");
 find (n, x :: xs) <= getPos (n, reverse (x :: xs));
+
+group : list alpha -> list (list alpha);
+group {} <= [];
+group (x :: xs) <= (x :: takeWhile ((= x), xs)) :: group (dropWhile ((= x), xs));
 
 replicate : num # alpha -> list alpha;
 replicate (n, x) <= take (n, repeat x);
