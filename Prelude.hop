@@ -13,6 +13,7 @@
 !                        encontradas na linguagem Haskell. Apoio operacional a !
 !                        partir de algumas operações existentes nos módulos    !
 !                        padrão "Prelude", "Data.List" e "List".               !
+!                                                                              !
 !                        Algumas funções do Prelude/List não estão incluídas   !
 !                        neste arquivo. Há funções exstentes neste arquivo que !
 !                        não são partes dos pacotes Haskell.                   !
