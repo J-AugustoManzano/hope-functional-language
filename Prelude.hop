@@ -3,7 +3,7 @@
 ! Módulo Hope .........: Prelude.hop                                           !
 !                                                                              !
 ! Simulação Haskell ...: Prelude/Data.List/List                                !
-! Versão ..............: 2.0.1                                                 !
+! Versão ..............: 2.0.2                                                 !
 ! Objetivo ............: Simulação base Haskell em Hope                        !
 ! Copyright ...........: (c) Augusto Manzano, 2022                             !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0 (https://creative !
@@ -81,8 +81,6 @@ front_with cond [] <= [];
 front_with cond (x :: xs) <= if cond x 
                              then x :: front_with cond xs 
                              else [];
-
-!!!!! group
 
 listPow : num # list num -> list num;
 listPow (_, [])      <= [];
@@ -198,6 +196,8 @@ foldl (f, n, x :: xs) <= foldl (f, f (n, x), xs);
 foldr : (alpha # beta -> beta) # beta # list alpha -> beta;
 foldr (f, n, [])      <= n;
 foldr (f, n, x :: xs) <= f (x, foldr (f, n, xs));
+!! >: foldr ((\ (c, acc) => acc <> [c]), "foo", ['a', 'b', 'c', 'd']);
+!! >> "foodcba" : list char
 
 concat2lst : list alpha # list alpha -> list alpha;
 concat2lst (xs, ys) <= foldr ((::), ys, xs);
@@ -233,6 +233,11 @@ intersect ([], _) <= [];
 intersect (x :: xs, lst) <= if elem (x, lst)
                             then x :: intersect (xs, lst)
                             else intersect (xs, lst);
+
+iterate : (alpha -> alpha) # alpha -> list alpha;
+iterate (f, x) <= x :: iterate (f, f x);
+!! >: take (10, (iterate (\x => x * 2, 1)));
+!! >> [1, 2, 4, 8, 16, 32, 64, 128, 256, 512] : list num
                             
 intersperse : alpha # list alpha -> list alpha;
 intersperse  (_, []) <= [];
@@ -241,10 +246,8 @@ intersperse (n, x :: xs) <= x :: n :: intersperse (n, xs);
 !! >: intersperse (0, [1, 2, 3, 4, 5]);
 !! >> [1, 0, 2, 0, 3, 0, 4, 0, 5] : list num
 
-iterate : (alpha -> alpha) # alpha -> list alpha;
-iterate (f, x) <= x :: iterate (f, f x);
-!! >: take (10, (iterate (\x => x * 2, 1)));
-!! >> [1, 2, 4, 8, 16, 32, 64, 128, 256, 512] : list num
+dec intercalate : list alpha # list (list alpha) -> list alpha;
+--- intercalate (xs, xss) <= concat (intersperse (xs, xss));
 
 last : list alpha -> alpha;
 last ([x])     <= x;
@@ -304,6 +307,12 @@ minimum (x :: y :: xs) <= if x < y
                           then minimum (x :: xs) 
                           else minimum (y :: xs);
 
+nubBy : (alpha # alpha -> truval) # list alpha -> list alpha;
+nubBy (f, []) <= [];
+nubBy (f, x :: xs) <= x :: nubBy (f, filter (lambda y => not (f (x, y)), xs));
+!! >: nubBy ((\(x, y) => x mod 3 = y mod 3), [1,2,4,5,6]);
+!! >> [1, 2, 6] : list num
+
 nub : list alpha -> list alpha;
 nub [] <= [];
 nub (x :: xs) <= x :: filter ((/= x), nub xs);
@@ -333,6 +342,12 @@ partition (f, x :: xs) <= if f x
 product : list num -> num;
 product xs <= foldl ((*), 1, xs);
 
+random : num -> num;
+random s <= pow (s * 15485863, 3) mod 2038074743 / 2038074743;
+
+randoms : num -> list num;
+randoms n <= random n :: randoms (n + 1);
+
 reduce : list alpha # (alpha # alpha -> alpha) # alpha -> alpha;
 reduce ([], f, n)      <= n;
 reduce (x :: xs, f, n) <= f (x, reduce (xs, f, n));
@@ -357,15 +372,6 @@ rotl (x::xs) <= xs <> [x];
 rotr : list alpha -> list alpha;
 rotr [] <= [];
 rotr xs <= last xs :: init xs;
-
-sortAux : list alpha # list alpha -> list alpha;
-sortAux ([], ys) <= ys;
-sortAux (x :: xs, ys) <=
-	sortAux (smaller, x :: sortAux (larger, ys))
-	where (smaller, larger) == partition ((< x), xs);
-
-dec sort : list alpha -> list alpha;
---- sort xs <= sortAux (xs, []);
 
 subtract : num # num -> num;
 subtract (x, y) <= y - x;
@@ -392,7 +398,14 @@ scanr1 (_, []) <= [];
 scanr1 (_, [x]) <= [x];
 scanr1 (f, x :: xs) <= f (x, head ys) :: ys where ys == scanr1 (f, xs);
 
-!!!!! sort
+sortAux : list alpha # list alpha -> list alpha;
+sortAux ([], ys) <= ys;
+sortAux (x :: xs, ys) <=
+	sortAux (smaller, x :: sortAux (larger, ys))
+	where (smaller, larger) == partition ((< x), xs);
+
+sort : list alpha -> list alpha;
+sort xs <= sortAux (xs, []);
 
 take : num # list alpha -> list alpha;
 take (n, [])      <= [];
