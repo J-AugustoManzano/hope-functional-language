@@ -472,7 +472,13 @@ unzip3 : list (alpha # alpha # alpha) -> list alpha # list alpha # list alpha;
 unzip3 [] <= ([], [], []);
 unzip3 xs <= unzipAux3 ([], [], [], xs);
 
-!!!!! unzip4
+unzipAux4 : list alpha # list alpha # list alpha # list alpha # list (alpha # alpha # alpha # alpha) -> list alpha # list alpha # list alpha # list alpha;
+unzipAux4 (xs, ys, zs, ws, []) <= (reverse xs, reverse ys, reverse zs, reverse ws);
+unzipAux4 (xs, ys, zs, ws, (x, y, z, w) :: as) <= unzipAux4 (x :: xs, y :: ys, z :: zs, w :: ws, as);
+
+unzip4 : list (alpha # alpha # alpha # alpha) -> list alpha # list alpha # list alpha # list alpha;
+unzip4 [] <= ([], [], [], []);
+unzip4 xs <= unzipAux4 ([], [], [], [], xs);
 
 !!!!! unzip5
 
@@ -532,7 +538,10 @@ diference ([], b) <= [];
 diference (a :: ax, b) <= if elem (a, b) 
                           then diference (ax, b) 
                           else a :: diference (ax, b);
-                          
+
+dropEnd : num # list alpha -> list alpha;
+dropEnd (n, xs) <= take (length xs - n, xs);
+
 find : alpha # list alpha -> num;
 find (_, [])      <= error ("Empty list!");
 find (n, x :: xs) <= getPos (n, reverse (x :: xs));
