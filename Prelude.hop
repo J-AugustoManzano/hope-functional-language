@@ -3,7 +3,7 @@
 ! Módulo Hope .........: Prelude.hop                                           !
 !                                                                              !
 ! Simulação Haskell ...: Prelude/Data.List/List                                !
-! Versão ..............: 2.0.2                                                 !
+! Versão ..............: 2.0.3                                                 !
 ! Objetivo ............: Simulação base Haskell em Hope                        !
 ! Copyright ...........: (c) Augusto Manzano, 2022                             !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0 (https://creative !
@@ -521,6 +521,13 @@ zipWith3 (f, a :: ax, b :: bx, c :: cx) <= f (a, b, c) :: zipWith3 (f, ax, bx, c
 !! :> zipWith3 ((\x, y, z => x+2*y+3*z), 1..5, 5..10, 10..15);
 !! >> [41, 47, 53, 59, 65] : list num
 
+!!!!! zipWith4
+
+!!!!! zipWith5
+
+!!!!! zipWith6
+
+!!!!! zipWith7
 
 
 ! !!! Funcionalidades auxiliares/extras - Haskell e nao Haskell
