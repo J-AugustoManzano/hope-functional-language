@@ -5,7 +5,7 @@
 !!!                                                      !!!
 !!! Augusto Manzano (2022) - www.canal.manzano.pro.br    !!!
 !!!                                                      !!!
-!!!                Version 2.0.2 - 2022                  !!!
+!!!                Version 2.0.4 - 2022                  !!!
 !!!                                                      !!!
 !!! This file should be used instead of the original     !!!
 !!! Hope language file on your system.                   !!!
@@ -57,7 +57,9 @@ abstype set pos;
 
 data list alpha == nil ++ alpha :: list alpha;
 data num        == succ num;
-data relation   == LESS ++ EQUAL ++ GREATER;    
+data ordering   == LT ++ EQ ++ GT; 
+data relation   == LESS ++ EQUAL ++ GREATER;
+data sorting    == ascending ++ descending;   
 data truval     == false ++ true;  
 data void       == Nothing;  
  
@@ -170,6 +172,7 @@ dec if_then_else : truval -> alpha -> alpha -> alpha;
 dec not          : truval -> truval;
 dec odd          : num -> truval;
 dec or           : truval # truval -> truval;
+dec sorted       : list alpha -> sorting;
 dec xor          : truval # truval -> truval;
 
 !!! Character conversion
@@ -190,6 +193,7 @@ dec isXdigit                                 : char -> truval;
 dec abs, ceil, fact, floor    : num -> num;
 dec erf, erfc, erfcx, normcdf : num -> num;  
 dec exp, log, log10, sqrt     : num -> num;
+dec normal, normalc           : num -> num;
 dec gcd, lcm, pow, logBase    : num # num -> num;
 dec max, min                  : alpha # alpha -> alpha;
 
@@ -432,6 +436,10 @@ private;
 
 --- negate (x) <= 0 - x;
 
+--- normal x <= erf(x/sqrt 2);
+
+--- normalc x <= erfc(x/sqrt 2);
+
 --- normcdf (x) <= erfc (0 - x / sqrt 2) / 2;
 
 --- not true  <= false;
@@ -499,6 +507,12 @@ dec return : alpha;
 
 --- signum n <= if n < 0 then 0 - 1 else  
                 if n = 0 then 0 else 1;
+                
+--- sorted [] <= ascending;
+--- sorted [x] <= ascending;
+--- sorted (x :: y :: xs) <= if x =< y
+                             then sorted (y :: xs)
+                             else descending; 
                                 
 --- snd (_, y) <= y;              
 
