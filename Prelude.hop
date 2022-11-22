@@ -480,7 +480,13 @@ unzip4 : list (alpha # alpha # alpha # alpha) -> list alpha # list alpha # list 
 unzip4 [] <= ([], [], [], []);
 unzip4 xs <= unzipAux4 ([], [], [], [], xs);
 
-!!!!! unzip5
+unzipAux5 : list alpha # list alpha # list alpha # list alpha # list alpha # list (alpha # alpha # alpha # alpha # alpha) -> list alpha # list alpha # list alpha # list alpha # list alpha;
+unzipAux5 (xs, ys, zs, ws, vs, []) <= (reverse xs, reverse ys, reverse zs, reverse ws, reverse vs);
+unzipAux5 (xs, ys, zs, ws, vs, (x, y, z, w, v) :: as) <= unzipAux5 (x :: xs, y :: ys, z :: zs, w :: ws, v :: vs, as);
+
+unzip5 : list (alpha # alpha # alpha # alpha # alpha) -> list alpha # list alpha # list alpha # list alpha # list alpha;
+unzip5 [] <= ([], [], [], [], []);
+unzip5 xs <= unzipAux5 ([], [], [], [], [], xs);
 
 !!!!! unzip6
 
