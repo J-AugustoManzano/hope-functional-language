@@ -492,7 +492,9 @@ unzipAux6 : list alpha # list alpha # list alpha # list alpha # list alpha # lis
 unzipAux6 (xs, ys, zs, ws, vs, us, []) <= (reverse xs, reverse ys, reverse zs, reverse ws, reverse vs, reverse us);
 unzipAux6 (xs, ys, zs, ws, vs, us, (x, y, z, w, v, u) :: as) <= unzipAux6 (x :: xs, y :: ys, z :: zs, w :: ws, v :: vs, u :: us, as);
 
-!!!!! unzip6
+unzip6 : list (alpha # alpha # alpha # alpha # alpha # alpha) -> list alpha # list alpha # list alpha # list alpha # list alpha # list alpha;
+unzip6 [] <= ([], [], [], [], [], []);
+unzip6 xs <= unzipAux6 ([], [], [], [], [], [], xs);
 
 !!!!! unzip7
 
