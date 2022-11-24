@@ -500,7 +500,9 @@ unzipAux7 : list alpha # list alpha # list alpha # list alpha # list alpha # lis
 unzipAux7 (xs, ys, zs, ws, vs, us, ts, []) <= (reverse xs, reverse ys, reverse zs, reverse ws, reverse vs, reverse us, reverse ts);
 unzipAux7 (xs, ys, zs, ws, vs, us, ts, (x, y, z, w, v, u, t) :: as) <= unzipAux7 (x :: xs, y :: ys, z :: zs, w :: ws, v :: vs, u :: us, t :: ts, as);
 
-!!!!! unzip7
+unzip7 : list (alpha # alpha # alpha # alpha # alpha # alpha # alpha) -> list alpha # list alpha # list alpha # list alpha # list alpha # list alpha # list alpha;
+unzip7 [] <= ([], [], [], [], [], [], []);
+unzip7 xs <= unzipAux7 ([], [], [], [], [], [], [], xs);
 
 words : list char -> list (list char);
   wordsAux : list char -> list(list char);
