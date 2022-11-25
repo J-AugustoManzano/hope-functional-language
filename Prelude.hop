@@ -589,6 +589,11 @@ splitAt' (n, y :: ys) <= if n < 0
                          else (y :: a, b) 
                          where (a, b) == splitAt' (n - 1, ys);  
 
+splitEvery : num # list alpha -> list (list alpha);
+splitEvery (_, []) <= [];
+splitEvery (n, xs) <= as :: splitEvery (n, bs)
+                      where (as, bs) == splitAt (n, xs);
+
 unique : list alpha -> list alpha;
 unique []        <= [];
 unique (x :: xs) <= if member (x, xs) 
