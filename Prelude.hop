@@ -523,7 +523,9 @@ zip4 : list alpha # list beta # list gamma # list delta -> list (alpha # beta # 
 zip4 (_, _, _, _) <= [];
 zip4 (a :: as, b :: bs, c :: cs, d :: ds) <= (a, b, c, d) :: zip4 (as, bs, cs, ds);
 
-!!!!! zip5
+zip5 : list alpha # list beta # list gamma # list delta # list epsilon -> list (alpha # beta # gamma # delta # epsilon);
+zip5 (_, _, _, _, _) <= [];
+zip5 (a :: as, b :: bs, c :: cs, d :: ds, e :: es) <= (a, b, c, d, e) :: zip5 (as, bs, cs, ds, es);
 
 !!!!! zip6
 
