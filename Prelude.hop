@@ -527,7 +527,9 @@ zip5 : list alpha # list beta # list gamma # list delta # list epsilon -> list (
 zip5 (_, _, _, _, _) <= [];
 zip5 (a :: as, b :: bs, c :: cs, d :: ds, e :: es) <= (a, b, c, d, e) :: zip5 (as, bs, cs, ds, es);
 
-!!!!! zip6
+zip6 : list alpha # list beta # list gamma # list delta # list epsilon # list dzeta -> list (alpha # beta # gamma # delta # epsilon # dzeta);
+zip6 (_, _, _, _, _, _) <= [];
+zip6 (a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs) <= (a, b, c, d, e, f) :: zip6 (as, bs, cs, ds, es, fs);
 
 !!!!! zip7
 
