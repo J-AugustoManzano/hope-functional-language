@@ -193,7 +193,7 @@ dec isXdigit                                 : char -> truval;
 dec abs, ceil, fact, floor    : num -> num;
 dec erf, erfc, erfcx, normcdf : num -> num;  
 dec exp, log, log10, sqrt     : num -> num;
-dec normal, normalc           : num -> num;
+dec normal, normalc, sum      : num -> num;
 dec gcd, lcm, pow, logBase    : num # num -> num;
 dec max, min                  : alpha # alpha -> alpha;
 
@@ -456,7 +456,10 @@ private;
 --- quot (n, d) <= n div d;
 
 --- quotRem (a, b) <= (a div b, a mod b);
-                           
+
+--- sum 0 <= 0;
+--- sum (succ n) <= succ n + sum n;
+
 --- sec x <= 1 / cos x;
 
 --- succ n <= n + 1;
