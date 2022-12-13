@@ -531,7 +531,10 @@ zip6 : list alpha # list beta # list gamma # list delta # list epsilon # list dz
 zip6 (_, _, _, _, _, _) <= [];
 zip6 (a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs) <= (a, b, c, d, e, f) :: zip6 (as, bs, cs, ds, es, fs);
 
-!!!!! zip7
+zip7 : list alpha # list beta # list gamma # list delta # list epsilon # list dzeta # list eta -> list (alpha # beta # gamma # delta # epsilon # dzeta # eta);
+zip7 (_, _, _, _, _, _, _) <= [];
+zip7 (a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs, g :: gs) <= (a, b, c, d, e, f, g) :: zip7 (as, bs, cs, ds, es, fs, gs);
+
 
 zipWith : (alpha # beta -> gamma) # list alpha # list beta -> list gamma;
 zipWith (_, _, _) <= [];
