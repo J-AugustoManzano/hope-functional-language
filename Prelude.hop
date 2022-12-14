@@ -3,7 +3,7 @@
 ! Módulo Hope .........: Prelude.hop                                           !
 !                                                                              !
 ! Simulação Haskell ...: Prelude/Data.List/List                                !
-! Versão ..............: 2.0.7                                                 !
+! Versão ..............: 2.0.8                                                 !
 ! Objetivo ............: Simulação base Haskell em Hope                        !
 ! Copyright ...........: (c) Augusto Manzano, 2022                             !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0 (https://creative !
@@ -548,7 +548,6 @@ zipWith3 (f, a :: ax, b :: bx, c :: cx) <= f (a, b, c) :: zipWith3 (f, ax, bx, c
 zipWith4 : (alpha # beta # gamma # delta -> epsilon) # list alpha # list beta # list gamma # list delta -> list epsilon;
 zipWith4 (_, _, _, _) <= [];
 zipWith4 (f, a :: as, b :: bs, c :: cs, d :: ds) <= f (a, b, c, d) :: zipWith4 (f, as, bs, cs, ds);
-
 
 !!!!! zipWith5
 
