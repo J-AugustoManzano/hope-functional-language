@@ -545,7 +545,10 @@ zipWith3 (f, a :: ax, b :: bx, c :: cx) <= f (a, b, c) :: zipWith3 (f, ax, bx, c
 !! :> zipWith3 ((\x, y, z => x+2*y+3*z), 1..5, 5..10, 10..15);
 !! >> [41, 47, 53, 59, 65] : list num
 
-!!!!! zipWith4
+zipWith4 : (alpha # beta # gamma # delta -> epsilon) # list alpha # list beta # list gamma # list delta -> list epsilon;
+zipWith4 (_, _, _, _) <= [];
+zipWith4 (f, a :: as, b :: bs, c :: cs, d :: ds) <= f (a, b, c, d) :: zipWith4 (f, as, bs, cs, ds);
+
 
 !!!!! zipWith5
 
