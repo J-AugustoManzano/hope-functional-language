@@ -3,9 +3,10 @@
 !!! Hope default environment (adapted/reorganized).      !!!
 !!! Standard.hop original by Professor Ross Paterson     !!!
 !!!                                                      !!!
-!!! Augusto Manzano (2022) - www.canal.manzano.pro.br    !!!
+!!! Augusto Manzano (2022-2023)                          !!!
+!!! www.canal.manzano.pro.br                             !!!
 !!!                                                      !!!
-!!!                Version 2.0.6 - 2022                  !!!
+!!!                Version 3.0.2 - 2023                  !!!
 !!!                                                      !!!
 !!! This file should be used instead of the original     !!!
 !!! Hope language file on your system.                   !!!
@@ -114,8 +115,6 @@ dec =, /=, <, =<, >, >= : alpha # alpha -> truval;
 dec o                   : (beta -> gamma) # (alpha -> beta) -> alpha -> gamma; 
 dec ||                  : list (alpha) # list (beta) -> list (alpha # beta);
 
-
-
 !!! Various functions - general use
 
 dec argv           : list (list char);
@@ -133,8 +132,10 @@ dec from           : num -> list num;
 dec fst            : alpha # beta -> alpha;
 dec id             : alpha -> alpha;
 dec mkpair         : alpha -> beta -> alpha # beta;
+dec nbrt           : num # num -> num;
 dec negate         : num -> num;
 dec recip          : num -> num;
+dec posAlpha       : char -> num;
 dec pred           : num -> num; 
 dec properFraction : num -> num # num;
 dec quot           : num # num -> num; 
@@ -205,6 +206,20 @@ dec acosh, asinh, atanh, acsch, asech, acoth         : num -> num;
 dec coth, csch, sech                                 : num -> num;
 dec atan2, hypot                                     : num # num -> num;
 
+!!! Bitwise simulation
+
+dec shiftL : num # num -> num;
+dec shiftR : num # num -> num;
+dec shift  : num # num -> num;
+dec xorBit : num # num -> num;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! >>> Criptography                                 <<< !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+dec caesarAux : char # num -> char;
+dec caesar    : list char # num -> list char;
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -307,6 +322,16 @@ private;
 --- bool f _ false <= f;
 --- bool _ t true  <= t;
 
+--- caesarAux (c, n) <= 
+      if c >= 'A' and c =< 'Z'
+      then chr (ord 'A' + ((ord c - ord 'A' + n) mod 26))
+      else if c >= 'a' and c =< 'z'
+           then chr (ord 'a' + ((ord c - ord 'a' + n) mod 26))
+           else c;
+
+--- caesar ([], _) <= [];
+--- caesar (c :: cs, n) <= caesarAux (c, n) :: caesar (cs, n); 
+
 --- choose (x :: xs) <= (x, xs);
 
 --- comp ([], f) <= [];
@@ -354,17 +379,16 @@ private;
 --- even n <= n mod 2 = 0;
 
 --- erf (0) <= 0; ! error is less than 1.2 * 10^-7 for all inputs
---- erf (x) <= 1 - t * exp ((0 - x) * x - 1.26551223 +
-                   t * (    1.00002368 +
-                   t * (    0.37409196 + 
-                   t * (    0.09678418 + 
-                   t * (0 - 0.18628806 + 
-                   t * (    0.27886807 + 
-                   t * (0 - 1.13520398 + 
-                   t * (    1.48851587 + 
-                   t * (0 - 0.82215223 + 
-                   t * (    0.17087277))))))))))
-             where t == 1 / (1 + 0.5 * abs (x));
+--- erf (x) <= round' (1 - 1 / (1 + 0.5 * abs (x)) * exp ((0 - x) * x - 1.26551223 +
+                       1 / (1 + 0.5 * abs (x)) * (    1.00002368 +
+                       1 / (1 + 0.5 * abs (x)) * (    0.37409196 + 
+                       1 / (1 + 0.5 * abs (x)) * (    0.09678418 + 
+                       1 / (1 + 0.5 * abs (x)) * (0 - 0.18628806 + 
+                       1 / (1 + 0.5 * abs (x)) * (    0.27886807 + 
+                       1 / (1 + 0.5 * abs (x)) * (0 - 1.13520398 + 
+                       1 / (1 + 0.5 * abs (x)) * (    1.48851587 + 
+                       1 / (1 + 0.5 * abs (x)) * (0 - 0.82215223 + 
+                       1 / (1 + 0.5 * abs (x)) * (    0.17087277)))))))))), 7);
 !!! erf = https://www.johndcook.com/blog/haskell-erf/
         
 --- erfc (0) <= 1;
@@ -434,6 +458,14 @@ private;
 
 --- mkpair x y <= (x, y);
 
+dec rootAux : num # num # num -> num;
+--- rootAux (b, n, x) <= if x = x'
+                         then x'
+                         else rootAux (b, n, x')
+                         where x' == (1 / n) * ((n - 1) * x + (b / pow (x, n - 1)));
+
+--- nbrt (b, i) <= rootAux (b, i, 1);
+
 --- negate (x) <= 0 - x;
 
 --- normal x <= erf(x/sqrt 2);
@@ -447,6 +479,10 @@ private;
 
 --- odd n <= n mod 2 /= 0;
 
+--- posAlpha ch <= if isLower ch
+                   then ord ch - ord 'a'
+                   else ord ch - ord 'A';
+              
 --- pred 0       <= 0;
 --- pred (n + 1) <= n;
 
@@ -504,6 +540,14 @@ dec return : alpha;
                      else ceil (n * pow (10, d)) / pow (10, d);  
 
 --- seq (_, y) <= y;    
+
+--- shiftL (x, n) <= x * pow(2, n);
+
+--- shiftR (x, n) <= x div pow (2, n);
+
+--- shift (x, n) <= if n >= 0
+                    then shiftL (x, n)
+                    else shiftR (x, 0 - n);
                    
 --- sign n <= if n < 0 then 0 - 1 else
               if n = 0 then 0 else 1;
@@ -532,6 +576,10 @@ dec return : alpha;
 --- truncate x <= if x < 0 
                   then floor (x) + 1
                   else floor (x);
+                  
+--- xorBit (x, y) <= if (x = 1 or y = 1) and (x /= y)
+                     then 1
+                     else 0;
               
 dec write_element : alpha -> list alpha -> beta; 
 !!! write_element x <= write_list;	
