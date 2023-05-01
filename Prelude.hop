@@ -3,7 +3,7 @@
 ! Módulo Hope .........: Prelude.hop                                           !
 !                                                                              !
 ! Simulação Haskell ...: Prelude/Data.List/List                                !
-! Versão ..............: 3.0.5                                                 !
+! Versão ..............: 3.0.6                                                 !
 ! Objetivo ............: Simulação base Haskell em Hope                        !
 ! Copyright ...........: (c) Augusto Manzano, 2023                             !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0 (https://creative !
@@ -55,15 +55,11 @@
 ! !!! SIMULAÇÃO "PRELUDE", "DATA.LIST" e "LIST" COM AJUSTES                !!! !
 ! !!! -------------------------------------------------------------------- !!! !
 
-
-
 ! !!! Operadores auxiliares
 ! !!! =====================
 
 infixr \\ : 3;
 dec \\ : list alpha # list beta -> list (alpha # beta);
-
-
 
 ! !!! Funcionalidades auxiliares/extras - nao Haskell
 ! !!! Funções que auxiliam as funções clones Haskell
@@ -173,7 +169,6 @@ slice (i, f, x) <= final (i, start (f, x));
 sumDigits : list char -> num;
 sumDigits [] <= 0;
 sumDigits (x :: xs) <= digitToInt x + sumDigits xs;                 
-
 
 ! !!! Funcionalidades Prelude: Haskell
 ! !!! Funções clones - reescritas
@@ -792,9 +787,8 @@ group : list alpha -> list (list alpha);
 group {} <= [];
 group (x :: xs) <= (x :: takeWhile ((= x), xs)) :: group (dropWhile ((= x), xs));
 
-
-dec countBy : (alpha -> beta) # list alpha -> list (beta # num);
---- countBy (f, xs) <= map (lambda ys => (head ys, length ys), group (map (f, xs)));
+countBy : (alpha -> beta) # list alpha -> list (beta # num);
+countBy (f, xs) <= map (lambda ys => (head ys, length ys), group (map (f, xs)));
 !!! >: countBy (\x => if x < 5 then "small" else "large", [1, 2, 3, 4, 5, 6, 7]);
 !!! >> [("small", 4), ("large", 3)] : list (list char # num)
 
