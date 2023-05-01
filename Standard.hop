@@ -3,7 +3,7 @@
 !!! Hope default environment (adapted/reorganized).      !!!
 !!! Standard.hop original by Professor Ross Paterson     !!!
 !!!                                                      !!!
-!!! Augusto Manzano (2022-2023)                          !!!
+!!! Augusto Manzano (2022-2023)                          !!! 
 !!! www.canal.manzano.pro.br                             !!!
 !!!                                                      !!!
 !!!                Version 3.0.2 - 2023                  !!!
@@ -25,7 +25,6 @@
 !!!                                                      !!!
 !!! ---------------------------------------------------- !!!
 
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! >>> infix/infixr operators                       <<< !!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -42,7 +41,6 @@ infix <, =<, >, >=, .. : 4;
 infix +, -             : 5;
 infix *, /, div, mod   : 6;
 infix ., @             : 9;
-
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 !!! >>> Type variables and other resources           <<< !!!
@@ -66,8 +64,6 @@ data void       == Nothing;
  
 type alpha X beta == alpha # beta;
 type set alpha    == list alpha;
-
-
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! >>> Math constants                               <<< !!!
@@ -95,8 +91,6 @@ dec e   : num;
 dec deg : num;
 dec pi  : num;
 dec rad : num;
-
-
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! >>> General operators / functions                <<< !!!
@@ -213,14 +207,12 @@ dec shiftR : num # num -> num;
 dec shift  : num # num -> num;
 dec xorBit : num # num -> num;
 
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! >>> Criptography                                 <<< !!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 dec caesarAux : char # num -> char;
 dec caesar    : list char # num -> list char;
-
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! >>> Protected code - private tunneling           <<< !!!
