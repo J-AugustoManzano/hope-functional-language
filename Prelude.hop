@@ -55,7 +55,7 @@
 ! !!! SIMULAÇÃO "PRELUDE", "DATA.LIST" e "LIST" COM AJUSTES                !!! !
 ! !!! -------------------------------------------------------------------- !!! !
 
-! !!! Operadores auxiliares
+! !!! Operadores auxiliares 
 ! !!! =====================
 
 infixr \\ : 3;
