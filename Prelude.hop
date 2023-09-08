@@ -562,7 +562,7 @@ tail (_ :: xs) <= xs;
 
 segs : list alpha -> list (list alpha);
 segs []        <= [[]];
-segs (x :: xs) <= segs xs <> tail (inits (x :: xs));
+segs (x :: xs) <= segs xs <> map (\y => x :: y, inits xs);
 
 subs : list alpha -> list (list alpha);
 subs []        <= [[]];
