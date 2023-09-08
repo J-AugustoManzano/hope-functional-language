@@ -76,10 +76,6 @@ afterWith cond (x :: xs) <= if cond x
                             then afterWith cond xs 
                             else x :: xs;
 
-between : alpha # list alpha -> list (list alpha);
-between (n, [])      <= [[n]];
-between (n, x :: xs) <= (n :: x :: xs) :: map (\y => x :: y, between (n, xs));
-
 comp : list alpha # (alpha -> truval) -> list alpha;
 comp ([], f) <= [];
 comp (x :: xs, f) <= if f x 
@@ -399,6 +395,10 @@ lookup (k, ((x, y) :: xyz)) <= if k = x
 map : (alpha -> beta) # list alpha -> list beta;
 map (_, [])      <= [];
 map (f, x :: xs) <= f x :: map (f, xs);
+
+between : alpha # list alpha -> list (list alpha);
+between (n, [])      <= [[n]];
+between (n, x :: xs) <= (n :: x :: xs) :: map (\y => x :: y, between (n, xs));
 
 combs : num # list alpha -> list (list alpha);
 combs (0, xs)          <= [[]];
