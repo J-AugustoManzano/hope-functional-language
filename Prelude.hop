@@ -400,6 +400,11 @@ map : (alpha -> beta) # list alpha -> list beta;
 map (_, [])      <= [];
 map (f, x :: xs) <= f x :: map (f, xs);
 
+combs : num # list alpha -> list (list alpha);
+combs (0, xs)          <= [[]];
+combs (n + 1, [])      <= [];
+combs (n + 1, x :: xs) <= map (\y => x :: y, combs (n, xs)) <> combs (n + 1, xs);
+
 elemIndices : alpha # list alpha -> list num;
 elemIndices (_, []) <= [];
 elemIndices (x, y :: ys) <=
