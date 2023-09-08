@@ -364,8 +364,8 @@ intersperse (n, x :: xs) <= x :: n :: intersperse (n, xs);
 !! >: intersperse (0, [1, 2, 3, 4, 5]);
 !! >> [1, 0, 2, 0, 3, 0, 4, 0, 5] : list num
 
-dec intercalate : list alpha # list (list alpha) -> list alpha;
---- intercalate (xs, xss) <= concat (intersperse (xs, xss));
+intercalate : list alpha # list (list alpha) -> list alpha;
+intercalate (xs, xss) <= concat (intersperse (xs, xss));
 
 last : list alpha -> alpha;
 last []        <= error ("Empty list!");
