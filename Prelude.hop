@@ -192,7 +192,6 @@ break (f, x :: xs) <= if f x
                       then ([], x :: xs)
                       else let (ys, zs) == break (f, xs) in (x :: ys, zs);
 
-
 compare : alpha # alpha -> relation;
 compare (x, y) <= if x = y
                   then EQUAL
