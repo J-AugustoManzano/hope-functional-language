@@ -466,7 +466,7 @@ partition (f, x :: xs) <= if f x
 	                      where (ayes, nayes) == partition (f, xs);
 
 perms : list alpha -> list (list alpha);
-perms [] <= [[]];
+perms []        <= [[]];
 perms (x :: xs) <= concatMap (\p => between (x, p), perms xs);
 
 product : list num -> num;
