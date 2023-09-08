@@ -77,8 +77,8 @@ afterWith cond (x :: xs) <= if cond x
                             else x :: xs;
 
 between : alpha # list alpha -> list (list alpha);
-between (e, []) <= [[e]];
-between (e, x :: xs) <= (e :: x :: xs) :: map (\y => x :: y, between (e, xs));
+between (n, [])      <= [[n]];
+between (n, x :: xs) <= (n :: x :: xs) :: map (\y => x :: y, between (n, xs));
 
 comp : list alpha # (alpha -> truval) -> list alpha;
 comp ([], f) <= [];
