@@ -3,7 +3,7 @@
 ! Módulo Hope .........: Prelude.hop                                           !
 !                                                                              !
 ! Simulação Haskell ...: Prelude/Data.List/List                                !
-! Versão ..............: 3.0.6                                                 !
+! Versão ..............: 4.1                                                   !
 ! Objetivo ............: Simulação base Haskell em Hope                        !
 ! Copyright ...........: (c) Augusto Manzano, 2023                             !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0 (https://creative !
@@ -75,6 +75,10 @@ afterWith cond [] <= [];
 afterWith cond (x :: xs) <= if cond x 
                             then afterWith cond xs 
                             else x :: xs;
+
+between : alpha # list alpha -> list (list alpha);
+between (e, []) <= [[e]];
+between (e, x :: xs) <= (e :: x :: xs) :: map (\y => x :: y, between (e, xs));
 
 comp : list alpha # (alpha -> truval) -> list alpha;
 comp ([], f) <= [];
@@ -203,7 +207,7 @@ concat (x :: xs) <= x <> concat xs;
 concatMap : (alpha -> list beta) # list alpha -> list beta;
 concatMap (f, []) <= [];
 concatMap (f, x :: xs) <= f x <> concatMap (f, xs);
-!! >: concatMap(\x => [x+2], [1,3,5]);
+!! >: concatMap(\x => [x + 2], [1,3,5]);
 !! >> [3, 5, 7] : list num
 
 curry : (alpha # beta -> gamma) -> alpha -> beta -> gamma;
@@ -461,7 +465,11 @@ partition (f, x :: xs) <= if f x
                           then (x :: ayes, nayes) 
                           else (ayes, x :: nayes)
 	                      where (ayes, nayes) == partition (f, xs);
-	                         
+
+perms : list alpha -> list (list alpha);
+perms [] <= [[]];
+perms (x :: xs) <= concatMap (\p => between (x, p), perms xs);
+
 product : list num -> num;
 product xs <= foldl ((*), 1, xs);
 
@@ -552,6 +560,14 @@ stripPrefix (x :: xs, y :: ys) <=
 tail : list alpha -> list alpha;
 tail []        <= error ("Empty list!");
 tail (_ :: xs) <= xs;
+
+segs : list alpha -> list (list alpha);
+segs []        <= [[]];
+segs (x :: xs) <= segs xs <> tail (inits (x :: xs));
+
+subs : list alpha -> list (list alpha);
+subs []        <= [[]];
+subs (x :: xs) <= map (\y => x :: y, subs xs) <> subs xs;
 
 indexOf : list alpha # list alpha -> num;
 indexOf (_, []) <= 0 - 1;
