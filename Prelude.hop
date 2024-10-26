@@ -3,9 +3,9 @@
 ! Módulo Hope .........: Prelude.hop                                           !
 !                                                                              !
 ! Simulação Haskell ...: Prelude/Data.List/List                                !
-! Versão ..............: 4.1                                                   !
+! Versão ..............: 4.2                                                   !
 ! Objetivo ............: Simulação base Haskell em Hope                        !
-! Copyright ...........: (c) Augusto Manzano, 2023                             !
+! Copyright ...........: (c) Augusto Manzano, 2024                             !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0 (https://creative !
 !                        commons.org/licenses/by-nc-sa/4.0/legalcode.pt)       !
 !                                                                              !
@@ -468,7 +468,7 @@ partition (f, []) <= ([], []);
 partition (f, x :: xs) <= if f x 
                           then (x :: ayes, nayes) 
                           else (ayes, x :: nayes)
-	                      where (ayes, nayes) == partition (f, xs);
+	                       where (ayes, nayes) == partition (f, xs);
 
 perms : list alpha -> list (list alpha);
 perms []        <= [[]];
