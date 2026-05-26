@@ -1,765 +1,698 @@
-! ------------------------------------------------------------ !
-!                                                              !
-! Módulo Hope .........: Prelude.hop                           !
-! Simulação Haskell ...: Prelude/Data.List/List                !
-! Versão ..............: 5.0                                   !
-! Objetivo ............: Simulação base Haskell em Hope        !
-! Copyright ...........: (c) Augusto Manzano, 2026             !
-! Licença .............: Creative Commons CC CC BY-NC-SA 4.0   !
-!                        https://creativecommons.org/licenses/ !
-!                        by-nc-sa/4.0/legalcode.pt             !
-!                                                              !
-! ------------------------------------------------------------ !   
+! ------------------------------------------------------------------------------------- !
+!                                                                                       !
+! Módulo Hope .........: Prelude.hop (Código Corrigido - Sem Duplicações)               !
+! Simulação Haskell ...: Prelude/Data.List/List                                         !
+! Versão ..............: 5.2                                                            !
+! Objetivo ............: Simulação base Haskell em Hope com precedência garantida       !
+! Copyright ...........: (c) Augusto Manzano, 2026                                      !
+! Licença .............: Creative Commons CC CC BY-NC-SA 4.0                            !
+!                        https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.pt !
+!                                                                                       !
+! ------------------------------------------------------------------------------------- !   
+
+
+! !!! =========================================================== !!! !
+! !!! CONFIGURAÇÃO AMBIENTE BÁSCIO DE TRABALHO                    !!! !
+! !!! =========================================================== !!! !
 
 data Maybe alpha == Nothing ++ Just (alpha);
 
 infixr \\ : 3;
 dec \\ : list alpha # list beta -> list (alpha # beta);
 
-! !!! ==================================================================== !!! !
-! !!! FUNÇÕES PRIMITIVAS ABSOLUTAS                                         !!! !
-! !!! ==================================================================== !!! !
 
-after : num # list alpha -> list alpha;
-after (0, xs) <= xs;
-after (n, []) <= [];
-after (succ n, x :: xs) <= after (n, xs);
+! !!! =========================================================== !!! !
+! !!! INTERFACE PÚBLICA OFICIAL                                   !!! !
+! !!! =========================================================== !!! !
 
-afterWith : (alpha -> truval) -> list alpha -> list alpha;
-afterWith cond [] <= [];
-afterWith cond (x :: xs) <= if cond x 
-                            then afterWith cond xs 
-                            else x :: xs;
-
-all : (alpha -> truval) # list alpha -> truval;
-all (_, [])      <= true;
-all (p, x :: xs) <= p x and all (p, xs);
-
-any : (alpha -> truval) # list alpha -> truval;
-any (_, [])      <= false;
-any (p, x :: xs) <= p x or any (p, xs);
-
-break : (alpha -> truval) # list alpha -> (list alpha # list alpha);
-break (f, []) <= ([], []);
-break (f, x :: xs) <= if f x
-                      then ([], x :: xs)
-                      else let (ys, zs) == break (f, xs) in (x :: ys, zs);
-
-compare : alpha # alpha -> relation;
-compare (x, y) <= if x = y
-                  then EQUAL
-                  else if x =< y
-                       then LESS
-                       else GREATER;
-
-concat : list (list alpha) -> list alpha;
-concat []        <= [];
-concat (x :: xs) <= x <> concat xs;
-
+dec after : num # list alpha -> list alpha;
+dec all : (alpha -> truval) # list alpha -> truval;
+dec any : (alpha -> truval) # list alpha -> truval;
+dec break : (alpha -> truval) # list alpha -> (list alpha # list alpha);
+dec compare : alpha # alpha -> relation;
+dec concat : list (list alpha) -> list alpha;
 dec const : alpha # beta -> alpha;
+dec curry : (alpha # beta -> gamma) -> alpha -> beta -> gamma;
+dec deleteBy : (alpha # alpha -> truval) # alpha # list alpha -> list alpha;
+dec dist : alpha # list beta -> list (alpha # beta);
+dec divMod : num # num -> num # num;                          
+dec drop : num # list alpha -> list alpha;
+dec dropfirst : alpha # list alpha -> list alpha;
+dec dropWhile : (alpha -> truval) # list alpha -> list alpha;
+dec elemBy : (alpha # alpha -> truval) # alpha # list alpha -> truval;
+dec encodeBase : num # alpha # list alpha -> list (num # alpha);
+dec fill : alpha # num -> list alpha;
+dec flip : (alpha # beta -> gamma) # beta # alpha -> gamma;
+dec foldl : (alpha # beta -> alpha) # alpha # list beta -> alpha;
+dec foldr : (alpha # beta -> beta) # beta # list alpha -> beta;
+dec front : num # list alpha -> list alpha;
+dec head : list alpha -> alpha;
+dec index : num # list num -> num;
+dec insert : alpha # list alpha -> list alpha;
+dec isPrefixOf : list alpha # list alpha -> truval;
+dec isSubsequenceOf : list alpha # list alpha -> truval;
+dec iterate : (alpha -> alpha) # alpha -> list alpha;
+dec intersperse : alpha # list alpha -> list alpha;
+dec length : list alpha -> num;
+dec many : alpha -> list alpha;
+dec maybe : beta # (alpha -> beta) # Maybe alpha -> beta;
+dec multiple : num # num -> truval;
+dec null : list alpha -> truval;
+dec otherwise : truval;
+dec print : alpha -> alpha;
+dec random : num -> num;
+dec rangeLst : num # num # num -> list num;
+dec reduce : list alpha # (alpha # alpha -> alpha) # alpha -> alpha;
+dec repeat : alpha -> list alpha;
+dec rotl : list alpha -> list alpha;
+dec scan : beta # (beta # alpha -> beta) -> list alpha -> list beta;
+dec scanl : (beta # alpha -> beta) # beta # list alpha -> list beta;
+dec setBuilderNotation : list alpha # (alpha -> truval) -> list alpha;
+dec singleton : alpha -> list alpha;
+dec span : (alpha -> truval) # list alpha -> list alpha # list alpha;
+dec splitAt' : num # list alpha -> list alpha # list alpha;
+dec subtract : num # num -> num;
+dec sum : list num -> num;
+dec sumDigits : list char -> num;
+dec uncons : list alpha -> alpha # list alpha;
+dec uncurry : (alpha -> beta -> gamma) -> alpha # beta -> gamma;
+dec unfold : (beta -> truval) # (beta -> alpha) # (beta -> beta) # beta -> list alpha;
+dec unfoldr : (beta -> truval) # (beta -> alpha) # (beta -> beta) # beta -> list alpha;
+dec unlines : list (list char) -> list char;
+dec unzip : list (alpha # beta) -> list alpha # list beta;
+dec zip : list alpha # list beta -> list (alpha # beta);
+dec zip3 : (list alpha # list beta # list gamma) -> list (alpha # beta # gamma);
+dec zip4 : list alpha # list beta # list gamma # list delta -> list (alpha # beta # gamma # delta);
+dec zip5 : list alpha # list beta # list gamma # list delta # list epsilon -> list (alpha # beta # gamma # delta # epsilon);
+dec zip6 : list alpha # list beta # list gamma # list delta # list epsilon # list dzeta -> list (alpha # beta # gamma # delta # epsilon # dzeta);
+dec zip7 : list alpha # list beta # list gamma # list delta # list epsilon # list dzeta # list eta -> list (alpha # beta # gamma # delta # epsilon # dzeta # eta);
+dec zipWith : (alpha # beta -> gamma) # list alpha # list beta -> list gamma;
+dec zipWith3 : (alpha # beta # gamma -> delta) # list alpha # list beta # list gamma -> list delta;
+dec zipWith4 : (alpha # beta # gamma # delta -> epsilon) # list alpha # list beta # list gamma # list delta -> list epsilon;
+dec zipWith5 : (alpha # beta # gamma # delta # epsilon -> dzeta) # list alpha # list beta # list gamma # list delta # list epsilon -> list dzeta;
+dec zipWith6 : (alpha # beta # gamma # delta # epsilon # dzeta -> eta) # list alpha # list beta # list gamma # list delta # list epsilon # list dzeta -> list eta;
+dec zipWith7 : (alpha # beta # gamma # delta # epsilon # dzeta # eta -> teta) # list alpha # list beta # list gamma # list delta # list epsilon # list dzeta # list eta -> list teta;
+dec takeWhile : (alpha -> truval) # list alpha -> list alpha;
+dec reverse : list alpha -> list alpha;
+dec isSuffixOf : list alpha # list alpha -> truval;
+dec start : num # list alpha -> list alpha;
+dec final : num # list alpha -> list alpha;
+dec getPos : alpha # list alpha -> num;
+dec tail : list alpha -> list alpha;
+dec take : num # list alpha -> list alpha;
+dec breakApart : list alpha -> list alpha # list alpha;
+dec slice : num # num # list num -> list num;
+dec splitAt : num # list alpha -> list alpha # list alpha;
+dec takeEnd : num # list alpha -> list alpha;
+dec dropEnd : num # list alpha -> list alpha;
+dec chunksOf : num # list alpha -> list (list alpha);
+dec splitEvery : num # list alpha -> list (list alpha);
+dec isInfixOf : list alpha # list alpha -> truval;
+dec foldr1 : (alpha # alpha -> alpha) # list alpha -> alpha;
+dec filter : (alpha -> truval) # list alpha -> list alpha;
+dec map : (alpha -> beta) # list alpha -> list beta;
+dec concatMap : (alpha -> list beta) # list alpha -> list beta;
+dec inits : list alpha -> list(list alpha);
+dec segs : list alpha -> list (list alpha);
+dec foldl1 : (alpha # alpha -> alpha) # list alpha -> alpha;
+dec product : list num -> num;
+dec replic : list alpha # num -> list alpha;
+dec replicate : num # alpha -> list alpha;
+dec between : alpha # list alpha -> list (list alpha);
+dec combs : num # list alpha -> list (list alpha);
+dec perms : list alpha -> list (list alpha);
+dec last : list alpha -> alpha;
+dec init : list alpha -> list alpha;
+dec rotr : list alpha -> list alpha;
+dec unwords : list (list char) -> list char;
+dec elem : alpha # list alpha -> truval;
+dec delete : alpha # list alpha -> list alpha;
+dec equality : list alpha # list alpha -> truval;
+dec subset : list alpha # list alpha -> truval;
+dec complement : list alpha # list alpha -> list alpha;
+dec difference : list alpha # list alpha -> list alpha;
+dec intersect : list alpha # list alpha -> list alpha;
+dec notElem : alpha # list alpha -> truval;
+dec remove : alpha # list alpha -> list alpha;
+dec nub : list alpha -> list alpha;
+dec compress : list alpha -> list alpha;
+dec unique : list alpha -> list alpha;
+dec deleteFirstsBy : (alpha # alpha -> truval) # list alpha # list alpha -> list alpha;
+dec intersectBy : (alpha # alpha -> truval) # list alpha # list alpha -> list alpha;
+dec unionBy : (alpha # alpha -> truval) # list alpha # list alpha -> list alpha;
+dec findIndex : (alpha -> truval) # list alpha -> num;
+dec elemIndex : alpha # list alpha -> num;
+dec intercalate : list alpha # list (list alpha) -> list alpha;
+dec indexOf : list alpha # list alpha -> num;
+dec partition : (alpha -> truval) # list alpha -> list alpha # list alpha;
+dec sort : list alpha -> list alpha;
+dec merge : list alpha # list alpha -> list alpha;
+dec union : list alpha # list alpha -> list alpha;
+dec group : list alpha -> list (list alpha);
+dec countBy : (alpha -> beta) # list alpha -> list (beta # num);
+dec groupBy : (alpha # alpha -> truval) # list alpha -> list (list alpha);
+dec words : list char -> list (list char);
+dec pack : list alpha -> list (list alpha);
+dec packSort : list alpha -> list (list alpha);
+dec foldr1_dep : (alpha # alpha -> alpha) # list alpha -> alpha;
+dec maximumBy : (alpha # alpha -> relation) # list alpha -> alpha;
+dec minimumBy : (alpha # alpha -> relation) # list alpha -> alpha;
+dec range : num # num -> list num;
+dec sortBy : (alpha # alpha -> relation) # list alpha -> list alpha;
+dec sortOn : (alpha -> beta) # list alpha -> list alpha;
+dec isPrime : num -> truval;
+dec primeFactors : num -> list num;
+dec primeLst : num # num -> list num;
+dec unzip3 : list (alpha # beta # gamma) -> list alpha # list beta # list gamma;
+dec unzip4 : list (alpha # beta # gamma # delta) -> list alpha # list beta # list gamma # list delta;
+dec unzip5 : list (alpha # beta # gamma # delta # epsilon) -> list alpha # list beta # list gamma # list delta # list epsilon;
+dec unzip6 : list (alpha # beta # gamma # delta # epsilon # dzeta) -> list alpha # list beta # list gamma # list delta # list epsilon # list dzeta;
+dec unzip7 : list (alpha # beta # gamma # delta # epsilon # dzeta # eta) -> list alpha # list beta # list gamma # list delta # list epsilon # list dzeta # list eta;
+dec tails : list alpha -> list (list alpha);
+dec multTable : num -> list (num # num # num);
+dec multTable' : num -> list (list char);
+dec lines_dep : list char -> list (list char);
+dec maximum : list alpha -> alpha;
+dec minimum : list alpha -> alpha;
+dec cycle : list alpha -> list alpha;
+dec insertBy : (alpha # alpha -> relation) # alpha # list alpha -> list alpha;
+dec scanr : (alpha # beta -> beta) # beta # list alpha -> list beta;
+dec scanr1 : (alpha # alpha -> alpha) # list alpha -> list alpha;
+dec transpose : list (list alpha) -> list (list alpha);
+dec fromList : list alpha -> list (alpha # num);
+dec fromList' : list alpha -> list (alpha # num);
+dec randoms : num -> list num;
+dec until : (alpha -> truval) # (alpha -> alpha) # alpha -> alpha;
+dec coPrime : num # num -> truval;
+
+
+
+! !!! =========================================================== !!! !
+! !!! FUNÇÕES DE SUPORTE INTERNAS                                 !!! !
+! !!! =========================================================== !!! !
+
+private;
+
+dec afterWith : (alpha -> truval) -> list alpha -> list alpha;
+--- afterWith cond [] <= [];
+--- afterWith cond (x :: xs) <= if cond x then afterWith cond xs else x :: xs;
+
+dec reverseAux : list alpha # list alpha -> list alpha;
+--- reverseAux ([], ys)    <= ys;
+--- reverseAux (x :: xs, ys) <= reverseAux (xs, x::ys);
+
+dec front_with : (alpha -> truval) -> list alpha -> list alpha;
+--- front_with cond [] <= [];
+--- front_with cond (x :: xs) <= if cond x then x :: front_with cond xs else [];
+
+dec replicBase : alpha # num -> list alpha;
+--- replicBase (_, 0) <= [];
+--- replicBase (x, n) <= x :: replicBase (x, n - 1);
+
+dec unwordsAux : list (list char) -> list char;
+--- unwordsAux [] <= [];
+--- unwordsAux (x :: xs) <= x <> " " <> unwordsAux xs;
+
+dec equalityAux : list alpha # list alpha -> truval;
+--- equalityAux ([], []) <= true;
+--- equalityAux ([], b) <= true;
+--- equalityAux (a, []) <= false;
+--- equalityAux (a :: ax, b) <= if elem (a, b) then equalityAux (ax, b) else false;
+
+dec findIndexAux : (alpha -> truval) # list alpha # num -> num;
+--- findIndexAux (_, [], _) <= 0 - 1;
+--- findIndexAux (p, x :: xs, i) <= if p x then i else findIndexAux (p, xs, i + 1);
+
+dec sortAux : list alpha # list alpha -> list alpha;
+--- sortAux ([], ys) <= ys;
+--- sortAux (x :: xs, ys) <= sortAux (smaller, x :: sortAux (larger, ys)) where (smaller, larger) == partition ((\z => z < x), xs);
+
+dec wordsAux : list char -> list(list char);
+--- wordsAux "" <= [];
+--- wordsAux cs <= w :: words rest where (w, rest) == span (not o isSpace, cs);
+
+dec rangeAux : num # num # num # list num -> list num;
+--- rangeAux (s, e, step, rest) <= if s = e then s :: rest else rangeAux (s + step, e, step, s :: rest);
+
+dec proper_tails : list alpha -> list (list alpha);
+--- proper_tails [] <= [];
+--- proper_tails (x :: xs) <= tails xs;
+
+dec diagonal : list alpha # list beta # list beta -> list (alpha # beta);
+--- diagonal (xs, rev_ys, y :: ys) <= (xs || y :: rev_ys) <> diagonal (xs, y :: rev_ys, ys);
+--- diagonal (xs, rev_ys, []) <= concat (map ((\ys' => ys' || rev_ys), (tails (tail xs))));
+
+--- after (0, xs) <= xs;
+--- after (n, []) <= [];
+--- after (succ n, x :: xs) <= after (n, xs);
+
+--- all (_, [])      <= true;
+--- all (p, x :: xs) <= p x and all (p, xs);
+
+--- any (_, [])      <= false;
+--- any (p, x :: xs) <= p x or any (p, xs);
+
+--- break (f, []) <= ([], []);
+--- break (f, x :: xs) <= if f x then ([], x :: xs) else let (ys, zs) == break (f, xs) in (x :: ys, zs);
+
+--- compare (x, y) <= if x = y then EQUAL else if x =< y then LESS else GREATER;
+
+--- concat []        <= [];
+--- concat (x :: xs) <= x <> concat xs;
+
 --- const (x, _) <= x;
 
-curry : (alpha # beta -> gamma) -> alpha -> beta -> gamma;
-curry f <= \ x => \ y => f(x, y);
+--- curry f <= \ x => \ y => f(x, y);
 
-deleteBy : (alpha # alpha -> truval) # alpha # list alpha -> list alpha;
-deleteBy (_, _, []) <= [];
-deleteBy (f, x, y :: ys) <= if f (x, y) 
-                            then ys 
-                            else y :: deleteBy (f, x, ys);
+--- deleteBy (_, _, []) <= [];
+--- deleteBy (f, x, y :: ys) <= if f (x, y) then ys else y :: deleteBy (f, x, ys);
 
-dist : alpha # list beta -> list (alpha # beta);
-dist (x, []) <= [];
-dist (x, y :: ys) <= (x, y) :: dist (x, ys);
+--- dist (x, []) <= [];
+--- dist (x, y :: ys) <= (x, y) :: dist (x, ys);
 
-dec divMod : num # num -> num # num;
 --- divMod (x, y) <= (x div y, x mod y);                          
 
-drop : num # list alpha -> list alpha;
-drop (0, xs)      <= xs;
-drop (n, [])      <= [];
-drop (n, x :: xs) <= drop (n - 1, xs);
+--- drop (0, xs)      <= xs;
+--- drop (n, [])      <= [];
+--- drop (n, x :: xs) <= drop (n - 1, xs);
 
-dropfirst : alpha # list alpha -> list alpha;
-dropfirst (x, []) <= [];
-dropfirst (x, y :: ys) <= if x = y then ys else y :: dropfirst (x, ys);
+--- dropfirst (x, []) <= [];
+--- dropfirst (x, y :: ys) <= if x = y then ys else y :: dropfirst (x, ys);
 
-dropWhile : (alpha -> truval) # list alpha -> list alpha;
-dropWhile (_, [])      <= [];
-dropWhile (p, x :: xs) <= if p x 
-                          then dropWhile (p, xs) 
-                          else x :: xs;
+--- dropWhile (_, [])      <= [];
+--- dropWhile (p, x :: xs) <= if p x then dropWhile (p, xs) else x :: xs;
 
-elemBy : (alpha # alpha -> truval) # alpha # list alpha -> truval;
-elemBy (_, _, []) <= false;
-elemBy (p, x, y :: ys) <= if p (x, y) 
-                          then true
-                          else elemBy (p, x, ys);
+--- elemBy (_, _, []) <= false;
+--- elemBy (p, x, y :: ys) <= if p (x, y) then true else elemBy (p, x, ys);
 
-encodeBase : num # alpha # list alpha -> list (num # alpha);
-encodeBase (n, x, []) <= [(n, x)];
-encodeBase (n, x, y :: ys) <= if x = y
-                              then encodeBase (n + 1, x, ys)
-                              else (n, x) :: encodeBase (1, y, ys);
+--- encodeBase (n, x, []) <= [(n, x)];
+--- encodeBase (n, x, y :: ys) <= if x = y then encodeBase (n + 1, x, ys) else (n, x) :: encodeBase (1, y, ys);
 
-fill : alpha # num -> list alpha;
-fill (x, 0) <= [];
-fill (x, n) <= x :: fill (x, n - 1);
+--- fill (x, 0) <= [];
+--- fill (x, n) <= x :: fill (x, n - 1);
 
-dec flip : (alpha # beta -> gamma) # beta # alpha -> gamma;
 --- flip (f, x, y) <= f (y, x);
 
-foldl : (alpha # beta -> alpha) # alpha # list beta -> alpha;
-foldl (f, n, [])      <= n;
-foldl (f, n, x :: xs) <= foldl (f, f (n, x), xs);
+--- foldl (f, n, [])      <= n;
+--- foldl (f, n, x :: xs) <= foldl (f, f (n, x), xs);
 
-foldr : (alpha # beta -> beta) # beta # list alpha -> beta;
-foldr (f, n, [])      <= n;
-foldr (f, n, x :: xs) <= f (x, foldr (f, n, xs));
+--- foldr (f, n, [])      <= n;
+--- foldr (f, n, x :: xs) <= f (x, foldr (f, n, xs));
 
-front : num # list alpha -> list alpha;
-front (0, xs) <= [];
-front (n, []) <= [];
-front (succ n, x :: xs) <= x :: front(n, xs);
+--- front (0, xs) <= [];
+--- front (n, []) <= [];
+--- front (succ n, x :: xs) <= x :: front(n, xs);
 
-front_with : (alpha -> truval) -> list alpha -> list alpha;
-front_with cond [] <= [];
-front_with cond (x :: xs) <= if cond x 
-                             then x :: front_with cond xs 
-                             else [];
+--- head []       <= error ("Empty list!");
+--- head (x :: _) <= x;
 
-head : list alpha -> alpha;
-head []       <= error ("Empty list!");
-head (x :: _) <= x;
+--- index (_, []) <= error "Index out of range!";
+--- index (0, x :: xs) <= x;
+--- index (n, x :: xs) <= index (n - 1, xs);
 
-index : num # list num -> num;
-index (_, []) <= error "Index out of range!";
-index (0, x :: xs) <= x;
-index (n, x :: xs) <= index (n - 1, xs);
+--- insert (n, [])      <= [n];
+--- insert (n, x :: xs) <= if n =< x then n :: x :: xs else x :: insert (n, xs);
 
-insert : alpha # list alpha -> list alpha;
-insert (n, [])      <= [n];
-insert (n, x :: xs) <= if n =< x 
-                       then n :: x :: xs 
-                       else x :: insert (n, xs);
+--- isPrefixOf ([], _) <= true;
+--- isPrefixOf (_, []) <= false;
+--- isPrefixOf (x :: xs, y :: ys) <= if x = y then isPrefixOf (xs, ys) else false;
 
-isPrefixOf : list alpha # list alpha -> truval;
-isPrefixOf ([], _) <= true;
-isPrefixOf (_, []) <= false;
-isPrefixOf (x :: xs, y :: ys) <= if x = y then isPrefixOf (xs, ys) else false;
+--- isSubsequenceOf ([], _) <= true;
+--- isSubsequenceOf (x :: xs, []) <= false;
+--- isSubsequenceOf (x:: xs, y :: ys) <= if x = y then isSubsequenceOf (xs, ys) else isSubsequenceOf (x :: xs, ys);
 
-isSubsequenceOf : list alpha # list alpha -> truval;
-isSubsequenceOf ([], _) <= true;
-isSubsequenceOf (x :: xs, []) <= false;
-isSubsequenceOf (x:: xs, y :: ys) <= if x = y then isSubsequenceOf (xs, ys) else isSubsequenceOf (x :: xs, ys);
+--- iterate (f, x) <= x :: iterate (f, f x);
 
-iterate : (alpha -> alpha) # alpha -> list alpha;
-iterate (f, x) <= x :: iterate (f, f x);
+--- intersperse  (_, []) <= [];
+--- intersperse  (_, [x]) <= [x];
+--- intersperse (n, x :: xs) <= x :: n :: intersperse (n, xs);
 
-intersperse : alpha # list alpha -> list alpha;
-intersperse  (_, []) <= [];
-intersperse  (_, [x]) <= [x];
-intersperse (n, x :: xs) <= x :: n :: intersperse (n, xs);
+--- length []        <= 0;
+--- length (x :: xs) <= 1 + length xs;
 
-length : list alpha -> num;
-length []        <= 0;
-length (x :: xs) <= 1 + length xs;
+--- many x <= xs whererec xs == x :: xs;
 
-many : alpha -> list alpha;
-many x <= xs whererec xs == x :: xs;
-
-dec maybe : beta # (alpha -> beta) # Maybe alpha -> beta;
 --- maybe (def, f, Nothing)  <= def;
 --- maybe (def, f, Just (x)) <= f (x);
 
-multiple : num # num -> truval;
-multiple (n, m) <= n mod m = 0;
+--- multiple (n, m) <= n mod m = 0;
 
-null : list alpha -> truval;
-null []       <= true;
-null (_ :: _) <= false;
+--- null []       <= true;
+--- null (_ :: _) <= false;
 
-dec otherwise : truval;
 --- otherwise <= true;
 
-print : alpha -> alpha;
-print n <= n;
+--- print n <= n;
 
-random : num -> num;
-random s <= pow (s * 15485863, 3) mod 2038074743 / 2038074743;
+--- random s <= pow (s * 15485863, 3) mod 2038074743 / 2038074743;
 
-rangeLst : num # num # num -> list num;
-rangeLst (i, f, p) <= if i > f then [] else i :: rangeLst (i + p, f, p);
+--- rangeLst (i, f, p) <= if i > f then [] else i :: rangeLst (i + p, f, p);
 
-reduce : list alpha # (alpha # alpha -> alpha) # alpha -> alpha;
-reduce ([], f, n)      <= n;
-reduce (x :: xs, f, n) <= f (x, reduce (xs, f, n));
+--- reduce ([], f, n)      <= n;
+--- reduce (x :: xs, f, n) <= f (x, reduce (xs, f, n));
 
-repeat : alpha -> list alpha;
-repeat x <= x :: repeat x;
+--- repeat x <= x :: repeat x;
 
-reverseAux : list alpha # list alpha -> list alpha;
-reverseAux ([], ys)    <= ys;
-reverseAux (x :: xs, ys) <= reverseAux (xs, x::ys);
+--- rotl [] <= [];
+--- rotl (x::xs) <= xs <> [x];
 
-rotl : list alpha -> list alpha;
-rotl [] <= [];
-rotl (x::xs) <= xs <> [x];
+--- scan (c, f) <= (c ::) o (\ [] => [] | x :: xs => scan (f (c, x), f) xs);
 
-scan : beta # (beta # alpha -> beta) -> list alpha -> list beta;
-scan (c, f) <= (c ::) o (\ [] => [] | x :: xs => scan (f (c, x), f) xs);
+--- scanl (_, n, []) <= [n];
+--- scanl (f, n, x :: xs) <= n :: scanl (f, f (n, x), xs);
 
-scanl : (beta # alpha -> beta) # beta # list alpha -> list beta;
-scanl (_, n, []) <= [n];
-scanl (f, n, x :: xs) <= n :: scanl (f, f (n, x), xs);
+--- setBuilderNotation ([], qualify) <= [];
+--- setBuilderNotation (x :: xs, qualify) <= if qualify x then x :: setBuilderNotation (xs, qualify) else setBuilderNotation (xs, qualify);
 
-setBuilderNotation : list alpha # (alpha -> truval) -> list alpha;
-setBuilderNotation ([], qualify) <= [];
-setBuilderNotation (x :: xs, qualify) <= if qualify x then x :: setBuilderNotation (xs, qualify) else setBuilderNotation (xs, qualify);
+--- singleton a <= a :: [];
 
-singleton : alpha -> list alpha;
-singleton a <= a :: [];
+--- span (f, []) <= ([], []);
+--- span (f, x :: xs) <= if f x then (x :: f, a) where (f, a) == span (f, xs) else ([], x :: xs);
 
-span : (alpha -> truval) # list alpha -> list alpha # list alpha;
-span (f, []) <= ([], []);
-span (f, x :: xs) <= if f x then (x :: f, a) where (f, a) == span (f, xs) else ([], x :: xs);
+--- splitAt' (0, ys)      <= ([], ys);
+--- splitAt' (_, [])      <= ([], []);
+--- splitAt' (n, y :: ys) <= if n < 0 then ([], y :: ys) else (y :: a, b) where (a, b) == splitAt' (n - 1, ys);
 
-splitAt' : num # list alpha -> list alpha # list alpha;
-splitAt' (0, ys)      <= ([], ys);
-splitAt' (_, [])      <= ([], []);
-splitAt' (n, y :: ys) <= if n < 0 then ([], y :: ys) else (y :: a, b) where (a, b) == splitAt' (n - 1, ys);  
+--- subtract (x, y) <= y - x;
 
-subtract : num # num -> num;
-subtract (x, y) <= y - x;
+--- sum []        <= 0;
+--- sum (x :: xs) <= x + sum xs;
 
-sum : list num -> num;
-sum []        <= 0;
-sum (x :: xs) <= x + sum xs;
+--- sumDigits [] <= 0;
+--- sumDigits (x :: xs) <= digitToInt x + sumDigits xs;
 
-sumDigits : list char -> num;
-sumDigits [] <= 0;
-sumDigits (x :: xs) <= digitToInt x + sumDigits xs;                 
+--- uncons [] <= error ("Cannot take uncons of an empty list");
+--- uncons (x :: xs) <= (x, xs);
 
-uncons : list alpha -> alpha # list alpha;
-uncons [] <= error ("Cannot take uncons of an empty list");
-uncons (x :: xs) <= (x, xs);
+--- uncurry f (x, y) <= f x y;
 
-uncurry : (alpha -> beta -> gamma) -> alpha # beta -> gamma;
-uncurry f (x, y) <= f x y;
+--- unfold (p, h, t, x) <= if p x then [] else h x :: unfold (p, h, t, (t x));
 
-unfold : (beta -> truval) # (beta -> alpha) # (beta -> beta) # beta -> list alpha;
-unfold (p, h, t, x) <= if p x then [] else h x :: unfold (p, h, t, (t x));
+--- unfoldr (p, h, t, x) <= if p x then [] else h x :: unfoldr (p, h, t, t x);
 
-unfoldr : (beta -> truval) # (beta -> alpha) # (beta -> beta) # beta -> list alpha;
-unfoldr (p, h, t, x) <= if p x then [] else h x :: unfoldr (p, h, t, t x);
+--- unlines [] <= [];
+--- unlines (x :: xs) <= x <> '\n' :: unlines xs;
 
-unlines : list (list char) -> list char;
-unlines [] <= [];
-unlines (x :: xs) <= x <> '\n' :: unlines xs;
+--- unzip [] <= ([], []);
+--- unzip ((a, b) :: xs) <= (a :: as, b :: bs) where (as, bs) == unzip xs;
 
-unwordsAux : list (list char) -> list char;
-unwordsAux [] <= [];
-unwordsAux (x :: xs) <= x <> " " <> unwordsAux xs;
+--- zip ([], _)            <= [];
+--- zip (_, [])            <= [];
+--- zip (x :: xs, y :: ys) <= (x, y) :: zip (xs, ys);
 
-unzip : list (alpha # beta) -> list alpha # list beta;
-unzip [] <= ([], []);
-unzip ((a, b) :: xs) <= (a :: as, b :: bs) where (as, bs) == unzip xs;
+--- zip3 (_, _, _) <= [];
+--- zip3 (a :: as, b :: bs, c :: cs) <= (a, b, c) :: zip3 (as, bs, cs);
 
-zip : list alpha # list beta -> list (alpha # beta);
-zip ([], _)            <= [];
-zip (_, [])            <= [];
-zip (x :: xs, y :: ys) <= (x, y) :: zip (xs, ys);
+--- zip4 (_, _, _, _) <= [];
+--- zip4 (a :: as, b :: bs, c :: cs, d :: ds) <= (a, b, c, d) :: zip4 (as, bs, cs, ds);
 
-zip3 : (list alpha # list beta # list gamma) -> list (alpha # beta # gamma);
-zip3 (_, _, _) <= [];
-zip3 (a :: as, b :: bs, c :: cs) <= (a, b, c) :: zip3 (as, bs, cs);
+--- zip5 (_, _, _, _, _) <= [];
+--- zip5 (a :: as, b :: bs, c :: cs, d :: ds, e :: es) <= (a, b, c, d, e) :: zip5 (as, bs, cs, ds, es);
 
-zip4 : list alpha # list beta # list gamma # list delta -> list (alpha # beta # gamma # delta);
-zip4 (_, _, _, _) <= [];
-zip4 (a :: as, b :: bs, c :: cs, d :: ds) <= (a, b, c, d) :: zip4 (as, bs, cs, ds);
+--- zip6 (_, _, _, _, _, _) <= [];
+--- zip6 (a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs) <= (a, b, c, d, e, f) :: zip6 (as, bs, cs, ds, es, fs);
 
-zip5 : list alpha # list beta # list gamma # list delta # list epsilon -> list (alpha # beta # gamma # delta # epsilon);
-zip5 (_, _, _, _, _) <= [];
-zip5 (a :: as, b :: bs, c :: cs, d :: ds, e :: es) <= (a, b, c, d, e) :: zip5 (as, bs, cs, ds, es);
+--- zip7 (_, _, _, _, _, _, _) <= [];
+--- zip7 (a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs, g :: gs) <= (a, b, c, d, e, f, g) :: zip7 (as, bs, cs, ds, es, fs, gs);
 
-zip6 : list alpha # list beta # list gamma # list delta # list epsilon # list dzeta -> list (alpha # beta # gamma # delta # epsilon # dzeta);
-zip6 (_, _, _, _, _, _) <= [];
-zip6 (a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs) <= (a, b, c, d, e, f) :: zip6 (as, bs, cs, ds, es, fs);
-
-zip7 : list alpha # list beta # list gamma # list delta # list epsilon # list dzeta # list eta -> list (alpha # beta # gamma # delta # epsilon # dzeta # eta);
-zip7 (_, _, _, _, _, _, _) <= [];
-zip7 (a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs, g :: gs) <= (a, b, c, d, e, f, g) :: zip7 (as, bs, cs, ds, es, fs, gs);
-
-zipWith : (alpha # beta -> gamma) # list alpha # list beta -> list gamma;
-zipWith (_, _, _) <= [];
-zipWith (f, x :: xs, y :: ys) <= f (x, y) :: zipWith (f, xs, ys);
-
-zipWith3 : (alpha # beta # gamma -> delta) # list alpha # list beta # list gamma -> list delta;
-zipWith3 (_, _, _) <= [];
-zipWith3 (f, a :: as, b :: bs, c :: cs) <= f (a, b, c) :: zipWith3 (f, as, bs, cs);
-
-zipWith4 : (alpha # beta # gamma # delta -> epsilon) # list alpha # list beta # list gamma # list delta -> list epsilon;
-zipWith4 (_, _, _, _) <= [];
-zipWith4 (f, a :: as, b :: bs, c :: cs, d :: ds) <= f (a, b, c, d) :: zipWith4 (f, as, bs, cs, ds);
-
-zipWith5 : (alpha # beta # gamma # delta # epsilon -> dzeta) # list alpha # list beta # list gamma # list delta # list epsilon -> list dzeta;
-zipWith5 (_, _, _, _, _) <= [];
-zipWith5 (f, a :: as, b :: bs, c :: cs, d :: ds, e :: es) <= f (a, b, c, d, e) :: zipWith5 (f, as, bs, cs, ds, es);
-
-zipWith6 : (alpha # beta # gamma # delta # epsilon # dzeta -> eta) # list alpha # list beta # list gamma # list delta # list epsilon # list dzeta -> list eta;
-zipWith6 (_, _, _, _, _, _) <= [];
-zipWith6 (g, a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs) <= g (a, b, c, d, e, f) :: zipWith6 (g, as, bs, cs, ds, es, fs);
-
-zipWith7 : (alpha # beta # gamma # delta # epsilon # dzeta # eta -> teta) # list alpha # list beta # list gamma # list delta # list epsilon # list dzeta # list eta -> list teta;
-zipWith7 (_, _, _, _, _, _, _) <= [];
-zipWith7 (h, a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs, g :: gs) <= h (a, b, c, d, e, f, g) :: zipWith7 (h, as, bs, cs, ds, es, fs, gs);
-
-! --- AJUSTE: takeWhile e dropWhile movidos para o bloco base para servir de suporte ao 'group'
-takeWhile : (alpha -> truval) # list alpha -> list alpha;
-takeWhile (_, [])      <= [];
-takeWhile (p, x :: xs) <= if p x then x :: takeWhile (p, xs) else [];
-
-
-! !!! ==================================================================== !!! !
-! !!! SEGUNDO BLOQUE (Funções que resolvem dependências em cadeia)         !!! !
-! !!! ==================================================================== !!! !
-
-! --- Depende de: reverseAux
-reverse : list alpha -> list alpha;
-reverse xs <= reverseAux (xs, []);
-
-! --- Depende de: reverse, isPrefixOf
-isSuffixOf : list alpha # list alpha -> truval;
-isSuffixOf ([], _) <= true;
-isSuffixOf (_, []) <= false;
-isSuffixOf (xs, ys) <= isPrefixOf (reverse xs, reverse ys);
-
-! --- Depende de: length
-final : num # list num -> list num;
-final (_, []) <= [];
-final (n, x :: xs) <= if n - 1 > 0 then final (n - 1, xs) else xs;
-
-start : num # list num -> list num;
-start (_, []) <= [];
-start (n, x :: xs) <= if n > 0 then x :: start (n - 1, xs) else [];
-
-getPos : alpha # list alpha -> num;
-getPos (_, [])      <= error ("Element does not exist in the list!");
-getPos (n, x :: xs) <= if n = x then length xs else getPos (n, xs);
-
-tail : list alpha -> list alpha;
-tail []        <= error ("Empty list!");
-tail (_ :: xs) <= xs;
-
-take : num # list alpha -> list alpha;
-take (n, [])      <= [];
-take (0, xs)      <= [];
-take (n, x :: xs) <= x :: take (n - 1, xs);
-
-! --- Dependem de: length, start, final
-breakApart : list num -> list num # list num;
-breakApart [] <= ([], []);
-breakApart xs <= if length xs mod 2 /= 0
-                 then (start (length xs div 2 + 1, xs), final (length xs div 2 + 1, xs))
-                 else (start (length xs div 2, xs), final (length xs div 2, xs));
-
-slice : num # num # list num -> list num;
-slice (i, f, x) <= final (i, start (f, x));    
-
-! --- Dependem de: take, drop, length
-splitAt : num # list alpha -> list alpha # list alpha;
-splitAt (n, xs) <= (take (n, xs), drop (n, xs));
-
-takeEnd : num # list alpha -> list alpha;
-takeEnd (n, xs) <= drop (length xs - n, xs);
-
-dropEnd : num # list alpha -> list alpha;
-dropEnd (n, xs) <= take (length xs - n, xs);
-
-! --- Depende de: splitAt, null
-chunksOf : num # list alpha -> list (list alpha);
-chunksOf (n, xs) <= if null ys then [xs'] else xs' :: chunksOf (n, ys) where (xs', ys) == splitAt (n, xs);
-
-splitEvery : num # list alpha -> list (list alpha);
-splitEvery (_, []) <= [];
-splitEvery (n, xs) <= as :: splitEvery (n, bs) where (as, bs) == splitAt (n, xs);
-
-! --- Depende de: take, length
-isInfixOf : list alpha # list alpha -> truval;
-isInfixOf (needle, []) <= false;
-isInfixOf (needle, h :: t) <= if take (length needle, h :: t) = needle then true else isInfixOf (needle, t);
-
-! --- Depende de: foldr
-concat2lst : list alpha # list alpha -> list alpha;
-concat2lst (xs, ys) <= foldr ((::), ys, xs);
-
-foldr1 : (alpha # alpha -> alpha) # list alpha -> alpha;
-foldr1 (f, [x]) <= x;
-foldr1 (f, x :: xs) <= f (x, foldr1 (f, xs));
-
-filter : (alpha -> truval) # list alpha -> list alpha;
-filter (_, [])      <= [];
-filter (p, x :: xs) <= if p x then x :: filter (p, xs) else filter (p, xs);
-
-! --- Depende de: map
-map : (alpha -> beta) # list alpha -> list beta;
-map (_, [])      <= [];
-map (f, x :: xs) <= f x :: map (f, xs);
-
-concatMap : (alpha -> list beta) # list alpha -> list beta;
-concatMap (f, []) <= [];
-concatMap (f, x :: xs) <= f x <> concatMap (f, xs);
-
-! --- Depende de: map
-inits : list alpha -> list(list alpha);
-inits <= ([] ::) o (\ [] => [] | x :: xs => map ((x ::), inits xs));
-
-! --- Depende de: inits
-segs : list alpha -> list (list alpha);
-segs []        <= [[]];
-segs (x :: xs) <= segs xs <> map (\y => x :: y, inits xs);
-
-! --- Depende de: foldl
-foldl1 : (alpha # alpha -> alpha) # list alpha -> alpha;
-foldl1 (f, x :: xs) <= foldl (f, x, xs);
-
-product : list num -> num;
-product xs <= foldl ((*), 1, xs);
-
-! --- Depende de: foldl, replicBase
-replicBase : alpha # num -> list alpha;
-replicBase (_, 0) <= [];
-replicBase (x, n) <= x :: replicBase (x, n - 1); 
-
-replic : list alpha # num -> list alpha;
-replic (xs, n) <= foldl (\ a, b => a <> replicBase (b, n), [], xs);
-
-! --- Depende de: repeat, take
-replicate : num # alpha -> list alpha;
-replicate (n, x) <= take (n, repeat x);
-
-! --- Depende de: map
-between : alpha # list alpha -> list (list alpha);
-between (n, [])      <= [[n]];
-between (n, x :: xs) <= (n :: x :: xs) :: map (\y => x :: y, between (n, xs));
-
-combs : num # list alpha -> list (list alpha);
-combs (0, xs)          <= [[]];
-combs (n + 1, [])      <= [];
-combs (n + 1, x :: xs) <= map (\y => x :: y, combs (n, xs)) <> combs (n + 1, xs);
-
-! --- Depende de: concatMap, between
-perms : list alpha -> list (list alpha);
-perms []        <= [[]];
-perms (x :: xs) <= concatMap (\p => between (x, p), perms xs);
-
-! --- Depende de: final, init
-last : list alpha -> alpha;
-last []        <= error ("Empty list!");
-last ([x])     <= x;
-last (x :: xs) <= last xs;
-
-init : list alpha -> list alpha;
-init []        <= error ("Empty list!");
-init ([x])     <= [];
-init (x :: xs) <= x :: init xs;
-
-rotr : list alpha -> list alpha;
-rotr [] <= [];
-rotr xs <= last xs :: init xs;
-
-unwords : list (list char) -> list char;
-unwords lst <= init (unwordsAux lst);
-
-! --- Depende de: match primitivo
-elem : alpha # list alpha -> truval;
-elem (x, [])      <= false;
-elem (x, y :: ys) <= x = y or elem (x, ys);
-
-! --- Depende de: elem
-delete : alpha # list alpha -> list alpha;
-delete (n, xs) <= deleteBy ((=), n, xs);
-
-equalityAux : list alpha # list alpha -> truval;
-equalityAux ([], []) <= true;
-equalityAux ([], b) <= true;
-equalityAux (a, []) <= false;
-equalityAux (a :: ax, b) <= if elem (a, b) then equalityAux (ax, b) else false;
-
-equality : list alpha # list alpha -> truval;
-equality (a, b) <= equalityAux (a, b) and equalityAux (b, a);
-
-subset : list alpha # list alpha -> truval;
-subset ([], ys) <= true;
-subset (x :: xs, ys) <= if elem (x, ys) then subset (xs, ys) else false;
-
-complement : list alpha # list alpha -> list alpha;
-complement ([], ys) <= ys;
-complement (xs, ys) <= if subset (xs, ys) then filter (\x => not (elem (x, xs)), ys) else [];
-
-difference : list alpha # list alpha -> list alpha;
-difference (a, []) <= a;
-difference ([], b) <= [];
-difference (a :: ax, b) <= if elem (a, b) then difference (ax, b) else a :: difference (ax, b);
-
-intersect : list alpha # list alpha -> list alpha;
-intersect ([], _) <= [];
-intersect (x :: xs, lst) <= if elem (x, lst) then x :: intersect (xs, lst) else intersect (xs, lst);
-
-notElem : alpha # list alpha -> truval;
-notElem (_, []) <= true;
-notElem (x, y :: ys) <= x /= y and notElem (x, ys);
-
-remove : alpha # list alpha -> list alpha;
-remove (x, ys) <= filter ((/= x), ys);
-
-! --- Depende de: filter
-nub : list alpha -> list alpha;
-nub [] <= [];
-nub (x :: xs) <= x :: filter ((/= x), nub xs);
-
-! --- Depende de: elem
-compress : list alpha -> list alpha;
-compress [] <= [];
-compress (x :: xs) <= if elem (x, xs) then compress xs else x :: compress xs;
-
-unique : list alpha -> list alpha;
-unique []        <= [];
-unique (x :: xs) <= if elem (x, xs) then unique xs else x :: unique xs;
-
-! --- Depende de: elemBy
-deleteFirstsBy : (alpha # alpha -> truval) # list alpha # list alpha -> list alpha;
-deleteFirstsBy (_, {}, _) <= [];
-deleteFirstsBy (_, xs, {}) <= xs;
-deleteFirstsBy (p, x :: xs, ys) <= if elemBy (p, x, ys) then deleteFirstsBy (p, xs, ys) else x :: deleteFirstsBy (p, xs, ys);
-
-intersectBy : (alpha # alpha -> truval) # list alpha # list alpha -> list alpha;
-intersectBy (_, [], _) <= [];
-intersectBy (_, _, []) <= [];
-intersectBy (p, x :: xs, ys) <= if elemBy (p, x, ys) then x :: intersectBy (p, xs, ys) else intersectBy (p, xs, ys);
-
-unionBy : (alpha # alpha -> truval) # list alpha # list alpha -> list alpha;
-unionBy (_, [], ys) <= ys;
-unionBy (_, xs, []) <= xs;
-unionBy (p, x :: xs, ys) <= if elemBy (p, x, ys) then unionBy (p, xs, ys) else x :: unionBy (p, xs, ys);
-
-! --- Depende de: findIndexAux
-findIndexAux : (alpha -> truval) # list alpha # num -> num;
-findIndexAux (_, [], _) <= 0 - 1;
-findIndexAux (p, x :: xs, i) <= if p x then i else findIndexAux (p, xs, i + 1);
-
-findIndex : (alpha -> truval) # list alpha -> num;
-findIndex (_, []) <= 0 - 1;
-findIndex (p, x :: xs) <= if p x then 0 else findIndexAux (p, xs, 1);
-
-elemIndex : alpha # list alpha -> num;
-elemIndex (n, []) <= error ("Nothing");
-elemIndex (n, x :: xs) <= if n = x then 0 else if pos < 0 then pos else pos + 1 where pos == elemIndex (n, xs);
-
-! --- Depende de: intersperse
-intercalate : list alpha # list (list alpha) -> list alpha;
-intercalate (xs, xss) <= concat (intersperse (xs, xss));
-
-! --- Depende de: isPrefixOf, tail
-indexOf : list alpha # list alpha -> num;
-indexOf (_, []) <= 0 - 1;
-indexOf ([], _) <= 0 - 1;
-indexOf (xs, ys) <= if isPrefixOf (xs, ys) then 0 else 1 + indexOf (xs, tail ys);
-
-! --- Depende de: partition
-partition : (alpha -> truval) # list alpha -> list alpha # list alpha;
-partition (f, []) <= ([], []);
-partition (f, x :: xs) <= if f x then (x :: ayes, nayes) else (ayes, x :: nayes) where (ayes, nayes) == partition (f, xs);
-
-sortAux : list alpha # list alpha -> list alpha;
-sortAux ([], ys) <= ys;
-sortAux (x :: xs, ys) <= sortAux (smaller, x :: sortAux (larger, ys)) where (smaller, larger) == partition ((< x), xs);
-
-! --- Depende de: sortAux
-sort : list alpha -> list alpha;
-sort xs <= sortAux (xs, []);
-
-! --- Depende de: merge, nub, sort
-merge : list alpha # list alpha -> list alpha;
-merge ([], []) <= [];
-merge (a, []) <= a;
-merge ([], b) <= b;
-merge (a :: ax, b) <= a :: merge (ax, b);
-
-union : list alpha # list alpha -> list alpha;
-union (a, b) <= sort (nub (merge (a, b)));
-
-! --- Depende de: takeWhile, dropWhile (agrupados agora em suporte prévio)
-group : list alpha -> list (list alpha);
-group {} <= [];
-group (x :: xs) <= (x :: takeWhile ((= x), xs)) :: group (dropWhile ((= x), xs));
-
-countBy : (alpha -> beta) # list alpha -> list (beta # num);
-countBy (f, xs) <= map (lambda ys => (head ys, length ys), group (map (f, xs)));
-
-! --- Depende de: span
-groupBy : (alpha # alpha -> truval) # list alpha -> list (list alpha);
-groupBy (_, []) <= [];
-groupBy (p, x :: xs) <= (x :: ys) :: groupBy (p, zs) where (ys, zs) == span (\a => p (x, a), xs);
-
-! --- Declarações mútuas de 'words' e 'wordsAux'
-words : list char -> list (list char);
-
-wordsAux : list char -> list(list char);
-wordsAux "" <= [];
-wordsAux cs <= w :: words rest where (w, rest) == span (not o isSpace, cs);
-
-words cs <= wordsAux (afterWith isSpace cs);
-
-! --- Depende de: mapM_
-mapM_ : (alpha -> beta) # list alpha -> list beta;
-mapM_ (_, []) <= [];
-mapM_ (f, x :: xs) <= (f x) :: mapM_ (f, xs);
-
-forM_ : list alpha # (alpha -> beta) -> list beta;
-forM_ (xs, f) <= mapM_ (f, reverse xs);
-
-! --- Depende de: pack
-pack : list alpha -> list (list alpha);
-pack [] <= [];
-pack ([x]) <= [[x]];
-pack (x :: xs) <= if elem (x, head (pack xs)) then (x :: head (pack xs)) :: tail (pack xs) else [x] :: pack xs;
-
-packSort : list alpha -> list (list alpha);
-packSort lst <= pack (sort (lst));
-
-! --- Depende de: foldr1
-foldr1_dep : (alpha # alpha -> alpha) # list alpha -> alpha;
-foldr1_dep (f, [x]) <= x;
-foldr1_dep (f, x :: xs) <= f (x, foldr1_dep (f, xs));
-
-maximumBy : (alpha # alpha -> relation) # list alpha -> alpha;
-maximumBy (cmp, xs) <= foldr1_dep (\(x, acc) => if cmp (x, acc) = GREATER then x else acc, xs);
-
-! --- AJUSTE: Corrigido o erro sintático de atribuição ("then")
-minimumBy : (alpha # alpha -> relation) # list alpha -> alpha;
-minimumBy (cmp, xs) <= foldr1_dep (\(x, acc) => if cmp (x, acc) = LESS then x else acc, xs);
-
-rangeAux : num # num # num # list num -> list num;
-rangeAux (s, e, step, rest) <= if s = e then s :: rest else rangeAux (s + step, e, step, s :: rest);
-
-range : num # num -> list num;
-range (s, e) <= if s = e then singleton s else rangeAux (e, s, if s > e then 1 else 0 - 1, []);
-
-sortBy : (alpha # alpha -> relation) # list alpha -> list alpha;
-sortBy (_, []) <= [];
-sortBy (cmp, x :: xs) <= sortBy (cmp, less) <> [x] <> sortBy (cmp, greater)
-       where less == filter (\y => cmp (y, x) = LESS, xs)
-       where greater == filter (\y => cmp (y, x) /= LESS, xs);
-
-sortOn : (alpha -> beta) # list alpha -> list alpha;
-sortOn (f, xs) <= sortBy (\(x, y) => compare (f x, f y), xs);
-
-! --- Depende de: rangeLst, multiple, setBuilderNotation
-isPrime : num -> truval;
-isPrime 1 <= false;
-isPrime 2 <= true;
-isPrime n <= not (length (setBuilderNotation (rangeLst (2, n - 1, 1), \ d => multiple (n, d))) > 0);
-
-primeFactors : num -> list num;
-primeFactors n <= filter (\ n => isPrime n, setBuilderNotation (rangeLst (1, n, 1), \ x => multiple (n, x)));
-
-primeLst : num # num -> list num;
-primeLst  (s, f) <= setBuilderNotation (rangeLst (s, f, 1), \ x => isPrime (x));
-
-! --- Depende de: unzip3 a unzip7
-unzip3 : list (alpha # beta # gamma) -> list alpha # list beta # list gamma;
-unzip3 [] <= ([], [], []);
-unzip3 ((a, b, c) :: xs) <= (a :: as, b :: bs, c :: cs) where (as, bs, cs) == unzip3 xs;
-
-unzip4 : list (alpha # beta # gamma # delta) -> list alpha # list beta # list gamma # list delta;
-unzip4 [] <= ([], [], [], []);
-unzip4 ((a, b, c, d) :: xs) <= (a :: as, b :: bs, c :: cs, d :: ds) where (as, bs, cs, ds) == unzip4 xs;
-
-unzip5 : list (alpha # beta # gamma # delta # epsilon) -> list alpha # list beta # list gamma # list delta # list epsilon;
-unzip5 [] <= ([], [], [], [], []);
-unzip5 ((a, b, c, d, e) :: xs) <= (a :: as, b :: bs, c :: cs, d :: ds, e :: es) where (as, bs, cs, ds, es) == unzip5 xs;
-
-unzip6 : list (alpha # beta # gamma # delta # epsilon # dzeta) -> list alpha # list beta # list gamma # list delta # list epsilon # list dzeta;
-unzip6 [] <= ([], [], [], [], [], []);
-unzip6 ((a, b, c, d, e, f) :: xs) <= (a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs) where (as, bs, cs, ds, es, fs) == unzip6 xs;
-
-unzip7 : list (alpha # beta # gamma # delta # epsilon # dzeta # eta) -> list alpha # list beta # list gamma # list delta # list epsilon # list dzeta # list eta;
-unzip7 [] <= ([], [], [], [], [], [], []);
-unzip7 ((a, b, c, d, e, f, g) :: xs) <= (a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs, g :: gs) where (as, bs, cs, ds, es, fs, gs) == unzip7 xs;
-
-! --- Declarações de 'tails' e 'proper_tails'
-tails : list alpha -> list (list alpha);
-
-proper_tails : list alpha -> list (list alpha);
-proper_tails [] <= [];
-proper_tails (x :: xs) <= tails xs;
-
-tails l <= l :: proper_tails l;
-
-! --- Depende de: tails
-diagonal : list alpha # list beta # list beta -> list (alpha # beta);
-diagonal (xs, rev_ys, y :: ys) <= (xs || y :: rev_ys) <> diagonal (xs, y :: rev_ys, ys);
-diagonal (xs, rev_ys, []) <= concat (map ((|| rev_ys), (tails (tail xs))));
-
-xs \\ ys <= diagonal (xs, [], ys);
-
-! --- Depende de: map
-multTable : num -> list (num # num # num);
-multTable n <= map (\i => (n, i, n * i), 1 .. 10);
-
-multTable' : num -> list (list char);
-multTable' n <= map (\i => num2str n <> "X" <> num2str i <> "=" <> num2str (n * i), 1..10);
-
-lines_dep : list char -> list (list char);
-lines_dep [] <= [];
-lines_dep (x :: xs) <= if x = '\n' then [] :: lines_dep xs else (\ [] => [[x]] | y :: ys => (x :: y) :: ys) (lines_dep xs);
-
-! --- Depende de: interpretador recursivo básico
-maximum : list alpha -> alpha;
-maximum []             <= error ("Empty list!");
-maximum ([x])          <= x;
-maximum (x :: y :: xs) <= if x > y then maximum (x :: xs) else maximum (y :: xs);
-
-minimum : list alpha -> alpha;
-minimum []             <= error ("Empty list!");
-minimum ([x])          <= x;
-minimum (x :: y :: xs) <= if x < y then minimum (x :: xs) else minimum (y :: xs);
-
-cycle : list alpha -> list alpha;
-cycle [] <= error ("Lista vazia!");
-cycle (x :: xs) <= x :: cycle (xs <> [x]);
-
-insertBy : (alpha # alpha -> relation) # alpha # list alpha -> list alpha;
-insertBy (_, x, []) <= singleton x;
-insertBy (f, x, y :: ys) <= if f (x, y) = GREATER then y :: insertBy (f, x, ys) else x :: y :: ys;
-
-scanr : (alpha # beta -> beta) # beta # list alpha -> list beta;
-scanr (_, n, []) <= [n];
-scanr (f, n, x :: xs) <= f (x, head ys) :: ys where ys == scanr (f, n, xs);
-
-scanr1 : (alpha # alpha -> alpha) # list alpha -> list alpha;
-scanr1 (_, []) <= [];
-scanr1 (_, [x]) <= [x];
-scanr1 (f, x :: xs) <= f (x, head ys) :: ys where ys == scanr1 (f, xs);
-
-transpose : list (list alpha) -> list (list alpha);
-transpose [[]] <= [];
-transpose ([]::_) <= [];
-transpose x <= (map (head, x)) :: transpose (map (tail, x));
-
-fromList : list alpha -> list (alpha # num);
-fromList xs <= zip (xs, from 0);
-
-fromList' : list alpha -> list (alpha # num);
-fromList' [] <= [];
-fromList' (x :: xs) <= (x, length xs) :: fromList' xs;
-
-randoms : num -> list num;
-randoms n <= random n :: randoms (n + 1);
-
-until : (alpha -> truval) # (alpha -> alpha) # alpha -> alpha;
-until (p, f, x) <= if p x then x else until (p, f, f x);
-
-coPrime : num # num -> truval;
-coPrime (x, y) <= gcd (x, y) = 1;
+--- zipWith (_, _, _) <= [];
+--- zipWith (f, x :: xs, y :: ys) <= f (x, y) :: zipWith (f, xs, ys);
+
+--- zipWith3 (_, _, _) <= [];
+--- zipWith3 (f, a :: as, b :: bs, c :: cs) <= f (a, b, c) :: zipWith3 (f, as, bs, cs);
+
+--- zipWith4 (_, _, _, _) <= [];
+--- zipWith4 (f, a :: as, b :: bs, c :: cs, d :: ds) <= f (a, b, c, d) :: zipWith4 (f, as, bs, cs, ds);
+
+--- zipWith5 (_, _, _, _, _) <= [];
+--- zipWith5 (f, a :: as, b :: bs, c :: cs, d :: ds, e :: es) <= f (a, b, c, d, e) :: zipWith5 (f, as, bs, cs, ds, es);
+
+--- zipWith6 (_, _, _, _, _, _) <= [];
+--- zipWith6 (g, a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs) <= g (a, b, c, d, e, f) :: zipWith6 (g, as, bs, cs, ds, es, fs);
+
+--- zipWith7 (_, _, _, _, _, _, _) <= [];
+--- zipWith7 (h, a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs, g :: gs) <= h (a, b, c, d, e, f, g) :: zipWith7 (h, as, bs, cs, ds, es, fs, gs);
+
+--- takeWhile (_, [])      <= [];
+--- takeWhile (p, x :: xs) <= if p x then x :: takeWhile (p, xs) else [];
+
+--- reverse xs <= reverseAux (xs, []);
+
+--- isSuffixOf ([], _) <= true;
+--- isSuffixOf (_, []) <= false;
+--- isSuffixOf (xs, ys) <= isPrefixOf (reverse xs, reverse ys);
+
+--- final (_, []) <= [];
+--- final (n, x :: xs) <= if n - 1 > 0 then final (n - 1, xs) else xs;
+
+--- start (_, []) <= [];
+--- start (n, x :: xs) <= if n > 0 then x :: start (n - 1, xs) else [];
+
+--- getPos (_, [])      <= error ("Element does not exist in the list!");
+--- getPos (n, x :: xs) <= if n = x then length xs else getPos (n, xs);
+
+--- tail []        <= error ("Empty list!");
+--- tail (_ :: xs) <= xs;
+
+--- take (n, [])      <= [];
+--- take (0, xs)      <= [];
+--- take (n, x :: xs) <= x :: take (n - 1, xs);
+
+--- breakApart [] <= ([], []);
+--- breakApart xs <= if length xs mod 2 /= 0 then (start (length xs div 2 + 1, xs), final (length xs div 2 + 1, xs)) else (start (length xs div 2, xs), final (length xs div 2, xs));
+          
+--- slice (i, f, x) <= final (i, start (f, x));    
+
+--- splitAt (n, xs) <= (take (n, xs), drop (n, xs));
+
+--- takeEnd (n, xs) <= drop (length xs - n, xs);
+
+--- dropEnd (n, xs) <= take (length xs - n, xs);
+
+--- chunksOf (n, xs) <= if null ys then [xs'] else xs' :: chunksOf (n, ys) where (xs', ys) == splitAt (n, xs);
+
+--- splitEvery (_, []) <= [];
+--- splitEvery (n, xs) <= as :: splitEvery (n, bs) where (as, bs) == splitAt (n, xs);
+
+--- isInfixOf (needle, []) <= false;
+--- isInfixOf (needle, h :: t) <= if take (length needle, h :: t) = needle then true else isInfixOf (needle, t);
+
+dec concat2lst : list alpha # list alpha -> list alpha;
+--- concat2lst (xs, ys) <= foldr ((::), ys, xs);
+
+--- foldr1 (f, [x]) <= x;
+--- foldr1 (f, x :: xs) <= f (x, foldr1 (f, xs));
+
+--- filter (_, [])      <= [];
+--- filter (p, x :: xs) <= if p x then x :: filter (p, xs) else filter (p, xs);
+
+--- map (_, [])      <= [];
+--- map (f, x :: xs) <= f x :: map (f, xs);
+
+--- concatMap (f, []) <= [];
+--- concatMap (f, x :: xs) <= f x <> concatMap (f, xs);
+
+--- inits <= ([] ::) o (\ [] => [] | x :: xs => map ((x ::), inits xs));
+
+--- segs []        <= [[]];
+--- segs (x :: xs) <= segs xs <> map ((\y => x :: y), inits xs);
+
+--- foldl1 (f, x :: xs) <= foldl (f, x, xs);
+
+--- product xs <= foldl ((*), 1, xs);
+
+--- replic (xs, n) <= foldl ((\a, b => a <> replicBase (b, n)), [], xs);
+
+--- replicate (n, x) <= take (n, repeat x);
+
+--- between (n, [])      <= [[n]];
+--- between (n, x :: xs) <= (n :: x :: xs) :: map ((\y => x :: y), between (n, xs));
+
+--- combs (0, xs)          <= [[]];
+--- combs (n + 1, [])      <= [];
+--- combs (n + 1, x :: xs) <= map ((\y => x :: y), combs (n, xs)) <> combs (n + 1, xs);
+
+--- perms []        <= [[]];
+--- perms (x :: xs) <= concatMap ((\p => between (x, p)), perms xs);
+
+--- last []        <= error ("Empty list!");
+--- last ([x])     <= x;
+--- last (x :: xs) <= last xs;
+
+--- init []        <= error ("Empty list!");
+--- init ([x])     <= [];
+--- init (x :: xs) <= x :: init xs;
+
+--- rotr [] <= [];
+--- rotr xs <= last xs :: init xs;
+
+--- unwords lst <= init (unwordsAux lst);
+
+--- elem (x, [])      <= false;
+--- elem (x, y :: ys) <= x = y or elem (x, ys);
+
+--- delete (n, xs) <= deleteBy ((=), n, xs);
+
+--- equality (a, b) <= equalityAux (a, b) and equalityAux (b, a);
+
+--- subset ([], ys) <= true;
+--- subset (x :: xs, ys) <= if elem (x, ys) then subset (xs, ys) else false;
+
+--- complement ([], ys) <= ys;
+--- complement (xs, ys) <= filter ((\x => not (elem (x, xs))), ys);
+
+--- difference (a, []) <= a;
+--- difference ([], b) <= [];
+--- difference (a :: ax, b) <= if elem (a, b) then difference (ax, b) else a :: difference (ax, b);
+
+--- intersect ([], _) <= [];
+--- intersect (x :: xs, lst) <= if elem (x, lst) then x :: intersect (xs, lst) else intersect (xs, lst);
+
+--- notElem (_, []) <= true;
+--- notElem (x, y :: ys) <= x /= y and notElem (x, ys);
+
+--- remove (x, ys) <= filter ((\z => x /= z), ys);
+
+--- nub [] <= [];
+--- nub (x :: xs) <= x :: filter ((\z => x /= z), nub xs);
+
+--- compress [] <= [];
+--- compress [x] <= [x];
+--- compress (x :: y :: xs) <= if x = y then compress (y :: xs) else x :: compress (y :: xs);
+
+--- unique []        <= [];
+--- unique (x :: xs) <= if elem (x, xs) then unique xs else x :: unique xs;
+
+--- deleteFirstsBy (_, {}, _) <= [];
+--- deleteFirstsBy (_, xs, {}) <= xs;
+--- deleteFirstsBy (p, x :: xs, ys) <= if elemBy (p, x, ys) then deleteFirstsBy (p, xs, ys) else x :: deleteFirstsBy (p, xs, ys);
+
+--- intersectBy (_, [], _) <= [];
+--- intersectBy (_, _, []) <= [];
+--- intersectBy (p, x :: xs, ys) <= if elemBy (p, x, ys) then x :: intersectBy (p, xs, ys) else intersectBy (p, xs, ys);
+
+--- unionBy (_, [], ys) <= ys;
+--- unionBy (_, xs, []) <= xs;
+--- unionBy (p, x :: xs, ys) <= if elemBy (p, x, ys) then unionBy (p, xs, ys) else x :: unionBy (p, xs, ys);
+
+--- findIndex (p, x :: xs) <= if p x then 0 else findIndexAux (p, xs, 1);
+
+--- elemIndex (n, []) <= error ("Nothing");
+--- elemIndex (n, x :: xs) <= if n = x then 0 else if pos < 0 then pos else pos + 1 where pos == elemIndex (n, xs);
+
+--- intercalate (xs, xss) <= concat (intersperse (xs, xss));
+
+--- indexOf (_, []) <= 0 - 1;
+--- indexOf ([], _) <= 0 - 1;
+--- indexOf (xs, ys) <= if isPrefixOf (xs, ys) then 0 else 1 + indexOf (xs, tail ys);
+
+--- partition (f, []) <= ([], []);
+--- partition (f, x :: xs) <= if f x then (x :: ayes, nayes) else (ayes, x :: nayes) where (ayes, nayes) == partition (f, xs);
+
+--- sort xs <= sortAux (xs, []);
+
+--- merge ([], []) <= [];
+--- merge (a, []) <= a;
+--- merge ([], b) <= b;
+--- merge (a :: ax, b) <= a :: merge (ax, b);
+
+--- union (a, b) <= sort (nub (merge (a, b)));
+
+--- group {} <= [];
+--- group (x :: xs) <= (x :: takeWhile ((\z => x = z), xs)) :: group (dropWhile ((\z => x = z), xs));
+
+--- countBy (f, xs) <= map ((\ys => (head ys, length ys)), group (map (f, xs)));
+
+--- groupBy (p, x :: xs) <= (x :: ys) :: groupBy (p, zs) where (ys, zs) == span ((\a => p (x, a)), xs);
+
+--- words cs <= wordsAux (afterWith isSpace cs);
+
+dec mapM_ : (alpha -> beta) # list alpha -> list beta;
+--- mapM_ (_, []) <= [];
+--- mapM_ (f, x :: xs) <= (f x) :: mapM_ (f, xs);
+
+dec forM_ : list alpha # (alpha -> beta) -> list beta;
+--- forM_ (xs, f) <= mapM_ (f, reverse xs);
+
+--- pack [] <= [];
+--- pack ([x]) <= [[x]];
+--- pack (x :: xs) <= if elem (x, head (pack xs)) then (x :: head (pack xs)) :: tail (pack xs) else [x] :: pack xs;
+
+--- packSort lst <= pack (sort (lst));
+
+--- foldr1_dep (f, [x]) <= x;
+--- foldr1_dep (f, x :: xs) <= f (x, foldr1_dep (f, xs));
+
+--- maximumBy (cmp, xs) <= foldr1_dep ((\(x, acc) => if cmp (x, acc) = GREATER then x else acc), xs);
+
+--- minimumBy (cmp, xs) <= foldr1_dep ((\(x, acc) => if cmp (x, acc) = LESS then x else acc), xs);
+
+--- range (s, e) <= if s = e then singleton s else rangeAux (e, s, if s > e then 1 else 0 - 1, []);
+
+--- sortBy (_, []) <= [];
+--- sortBy (cmp, x :: xs) <= sortBy (cmp, less) <> [x] <> sortBy (cmp, greater)
+       where less == filter ((\y => cmp (y, x) = LESS), xs)
+       where greater == filter ((\y => cmp (y, x) /= LESS), xs);
+
+--- sortOn (f, xs) <= sortBy ((\(x, y) => compare (f x, f y)), xs);
+
+--- isPrime 1 <= false;
+--- isPrime 2 <= true;
+--- isPrime n <= not (length (setBuilderNotation (rangeLst (2, n - 1, 1), (\d => multiple (n, d)))) > 0);
+
+--- primeFactors n <= filter ((\n' => isPrime n'), setBuilderNotation (rangeLst (1, n, 1), (\x => multiple (n, x))));
+
+--- primeLst  (s, f) <= setBuilderNotation (rangeLst (s, f, 1), (\x => isPrime (x)));
+
+--- unzip3 [] <= ([], [], []);
+--- unzip3 ((a, b, c) :: xs) <= (a :: as, b :: bs, c :: cs) where (as, bs, cs) == unzip3 xs;
+
+--- unzip4 [] <= ([], [], [], []);
+--- unzip4 ((a, b, c, d) :: xs) <= (a :: as, b :: bs, c :: cs, d :: ds) where (as, bs, cs, ds) == unzip4 xs;
+
+--- unzip5 [] <= ([], [], [], [], []);
+--- unzip5 ((a, b, c, d, e) :: xs) <= (a :: as, b :: bs, c :: cs, d :: ds, e :: es) where (as, bs, cs, ds, es) == unzip5 xs;
+
+--- unzip6 [] <= ([], [], [], [], [], []);
+--- unzip6 ((a, b, c, d, e, f) :: xs) <= (a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs) where (as, bs, cs, ds, es, fs) == unzip6 xs;
+
+--- unzip7 [] <= ([], [], [], [], [], [], []);
+--- unzip7 ((a, b, c, d, e, f, g) :: xs) <= (a :: as, b :: bs, c :: cs, d :: ds, e :: es, f :: fs, g :: gs) where (as, bs, cs, ds, es, fs, gs) == unzip7 xs;
+
+--- multTable n <= map ((\i => (n, i, n * i)), 1 .. 10);
+
+--- multTable' n <= map ((\i => num2str n <> "X" <> num2str i <> "=" <> num2str (n * i)), 1..10);
+
+--- lines_dep [] <= [];
+--- lines_dep (x :: xs) <= if x = '\n' then [] :: lines_dep xs else (\ [] => [[x]] | y :: ys => (x :: y) :: ys) (lines_dep xs);
+
+--- maximum []             <= error ("Empty list!");
+--- maximum ([x])          <= x;
+--- maximum (x :: y :: xs) <= if x > y then maximum (x :: xs) else maximum (y :: xs);
+
+--- minimum []             <= error ("Empty list!");
+--- minimum ([x])          <= x;
+--- minimum (x :: y :: xs) <= if x < y then minimum (x :: xs) else minimum (y :: xs);
+
+--- cycle [] <= error ("Lista vazia!");
+--- cycle (x :: xs) <= x :: cycle (xs <> [x]);
+
+--- insertBy (_, x, []) <= singleton x;
+--- insertBy (f, x, y :: ys) <= if f (x, y) = GREATER then y :: insertBy (f, x, ys) else x :: y :: ys;
+
+--- scanr (_, n, []) <= [n];
+--- scanr (f, n, x :: xs) <= f (x, head ys) :: ys where ys == scanr (f, n, xs);
+
+--- scanr1 (_, []) <= [];
+--- scanr1 (_, [x]) <= [x];
+--- scanr1 (f, x :: xs) <= f (x, head ys) :: ys where ys == scanr1 (f, xs);
+
+--- transpose [[]] <= [];
+--- transpose ([]::_) <= [];
+--- transpose x <= (map (head, x)) :: transpose (map (tail, x));
+
+--- randoms n <= random n :: randoms (n + 1);
+
+--- until (p, f, x) <= if p x then x else until (p, f, f x);
+
+--- coPrime (x, y) <= gcd (x, y) = 1;
