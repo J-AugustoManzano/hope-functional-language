@@ -1,13 +1,20 @@
 # Hope Functional Language
 
-Repositório com arquivos complementares ao uso da Linguagem Hope com o objetivo de dinamizar o uso da linguagem além de sua forma original.
+Este repositório contém arquivos complementares para a linguagem de programação funcional Hope, desenvolvidos com o objetivo de estender suas capacidades e dinamizar sua utilização além do escopo original.
 
-O arquivo "Standard.hop" acrescenta algumas funcionalidades comuns e importantes existentes em outras linguagens. Este arquivo deve ser copiado para o diretório onde há o arquivo original de mesmo nome. Para manter o arquivo original intacto mude-o de nome mantendo-o no mesmo local (por precaução). Esse arquivo funciona no S.O. Windows, não sendo compatível no Linux.
+Arquivos Disponíveis
+--------------------
 
-O arquivo "Prelude.hop" tem por objetivo implementar em Hope as principais funcionalidades encontradas no ambiente Prelude da linguage Haskell. No entanto, isto não significa que a implemntação em Hope seja idêntica a real implementação Haskell.
+* Standard.hop
+  Acrescenta funcionalidades comuns e essenciais presentes em outras linguagens de programação.
+  - Instalação: Substitua o arquivo original de mesmo nome no diretório da linguagem por esta versão. Por precaução, recomenda-se renomear e preservar o arquivo original intacto no mesmo local antes da substituição.
 
-Material em desenvolvimento (deve ser usado com cautela).
+* Prelude.hop
+  Tem por objetivo implementar em Hope as principais funções encontradas no ambiente Prelude da linguagem Haskell. Cabe ressaltar que esta é uma adaptação e as implementações não são idênticas às originais em Haskell.
 
-Os testes dos arquivos "Standard.hop" e "Prelude.hop" são realizados, até o momento, apenas no sistema operacional Windows junto a compilação criada por Marcos Alfaro (http://hopelang.blogspot.com/). No sistema operacional Linux a implementação destes arquivos geram problemas de execução.
+Compatibilidade e Ambiente de Testes
+------------------------------------
 
-OBS: O material aqui disponibilizado foi testado apenas no S.O. Windows.
+* Status do Projeto: Material sob constante desenvolvimento; utilize com cautela.
+* Compatibilidade: O material disponibilizado foi homologado e testado apenas no sistema operacional Windows, utilizando a distribuição/compilação criada por Marcos Alfaro (disponível em http://hopelang.blogspot.com/).
+* Restrição: Até o momento, a execução destes arquivos no sistema operacional Linux gera inconsistências e problemas de execução, não sendo recomendada para este ambiente.
