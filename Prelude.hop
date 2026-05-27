@@ -2,7 +2,7 @@
 !                                                                                       !
 ! Módulo Hope .........: Prelude.hop (Código Corrigido - Sem Duplicações)               !
 ! Simulação Haskell ...: Prelude/Data.List/List                                         !
-! Versão ..............: 5.3                                                            !
+! Versão ..............: 5.4                                                            !
 ! Objetivo ............: Simulação base Haskell em Hope com precedência garantida       !
 ! Copyright ...........: (c) Augusto Manzano, 2026                                      !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0                            !
@@ -343,6 +343,10 @@ dec wordsAux : list char -> list(list char);
 --- singleton a <= a :: [];
 
 --- subtract (x, y) <= y - x;
+
+--- take (n, [])      <= [];
+--- take (0, xs)      <= [];
+--- take (n, x :: xs) <= x :: take (n - 1, xs);
 
 --- uncons [] <= error ("Cannot take uncons of an empty list");
 --- uncons (x :: xs) <= (x, xs);
