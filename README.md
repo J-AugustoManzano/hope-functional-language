@@ -10,7 +10,7 @@ Arquivos Disponíveis
   - Instalação: Substitua o arquivo original de mesmo nome no diretório da linguagem por esta versão. Por precaução, recomenda-se renomear e preservar o arquivo original intacto no mesmo local antes da substituição.
 
 * Prelude.hop
-  Tem por objetivo implementar em Hope as principais funções encontradas no ambiente Prelude da linguagem Haskell. Cabe ressaltar que esta é uma adaptação e as implementações não são idênticas às originais em Haskell.
+  Tem por objetivo implementar em HOPE as principais funções encontradas no ambiente Prelude da linguagem Haskell. Cabe ressaltar que esta é uma adaptação e as implementações não são idênticas às originais em Haskell.
 
 Compatibilidade e Ambiente de Testes
 ------------------------------------
