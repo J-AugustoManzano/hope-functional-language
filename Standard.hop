@@ -47,8 +47,7 @@ infix ., @             : 9;
 !!! >>> Type variables and other resources           <<< !!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-typevar alpha, beta, gamma, delta, epsilon, 
-        dzeta, eta,  teta,  iota,  capa;
+typevar alpha, beta, gamma, delta, epsilon, dzeta, eta, teta, iota,  apa;
 
 abstype char;  
 abstype neg -> pos;
