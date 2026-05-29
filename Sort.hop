@@ -10,7 +10,7 @@
 !                                                                                       !
 ! ------------------------------------------------------------------------------------- !
 
-uses Prelude;
+uses prelude;
 
 ! !!! =========================================================== !!! !
 ! !!! ALGORITMOS DE CLASSIFICAÇÃO                                 !!! !
@@ -143,20 +143,3 @@ dec flattenMyTree : MyTree(alpha) -> list alpha;
 --- flattenMyTree (Node(l, x, r)) <= flattenMyTree(l) <> [x] <> flattenMyTree(r);
 
 --- treeSort (xs) <= flattenMyTree (buildMyTree (xs, Empty));
-
-
-!! Teste Unificado
-!! let nomes == ["Zeca", "Ana", "Bia", "Carlos", "Duda"] in
-!! (
-!!   bitonicSort(nomes),
-!!   bubbleSort(nomes),
-!!   cycleSort(nomes),
-!!   combSort(nomes),
-!!   gnomeSort(nomes),
-!!   insertionSort(nomes),
-!!   mergeSort(nomes),
-!!   oddEvenSort(nomes),
-!!   quickSort(nomes),
-!!   selectionSort(nomes),
-!!   treeSort(nomes)
-!! );
