@@ -1,0 +1,132 @@
+======================================================================
+MANUAL DE USO — MÓDULO SORT.HOP
+Augusto Manzano (C) 2026 - v# 1.0
+======================================================================
+
+----------------------------------------------------------------------
+bitonicSort : list alpha -> list alpha
+----------------------------------------------------------------------
+Descrição:
+  Classificação baseada em divisão recursiva e intercalação
+  ordenada de subsequências.
+
+Exemplos:
+  bitonicSort([7, 3, 9, 1]); → [1, 3, 7, 9]
+  bitonicSort(["C", "A", "B"]); → ["A", "B", "C"]
+
+
+----------------------------------------------------------------------
+bubbleSort : list alpha -> list alpha
+----------------------------------------------------------------------
+Descrição:
+  Classificação por trocas sucessivas entre elementos adjacentes.
+
+Exemplos:
+  bubbleSort([7, 3, 9, 1]); → [1, 3, 7, 9]
+  bubbleSort(["C", "A", "B"]); → ["A", "B", "C"]
+
+
+----------------------------------------------------------------------
+cycleSort : list alpha -> list alpha
+----------------------------------------------------------------------
+Descrição:
+  Classificação baseada no reposicionamento cíclico dos elementos.
+
+Exemplos:
+  cycleSort([7, 3, 9, 1]); → [1, 3, 7, 9]
+  cycleSort(["C", "A", "B"]); → ["A", "B", "C"]
+
+
+----------------------------------------------------------------------
+combSort : list alpha -> list alpha
+----------------------------------------------------------------------
+Descrição:
+  Variante do Bubble Sort utilizando saltos progressivamente
+  menores entre comparações.
+
+Exemplos:
+  combSort([7, 3, 9, 1]); → [1, 3, 7, 9]
+  combSort(["C", "A", "B"]); → ["A", "B", "C"]
+
+
+----------------------------------------------------------------------
+gnomeSort : list alpha -> list alpha
+----------------------------------------------------------------------
+Descrição:
+  Classificação incremental baseada em trocas locais sucessivas.
+
+Exemplos:
+  gnomeSort([7, 3, 9, 1]); → [1, 3, 7, 9]
+  gnomeSort(["C", "A", "B"]); → ["A", "B", "C"]
+
+
+----------------------------------------------------------------------
+insertionSort : list alpha -> list alpha
+----------------------------------------------------------------------
+Descrição:
+  Classificação por inserção progressiva em subsequência ordenada.
+
+Exemplos:
+  insertionSort([7, 3, 9, 1]); → [1, 3, 7, 9]
+  insertionSort(["C", "A", "B"]); → ["A", "B", "C"]
+
+
+----------------------------------------------------------------------
+mergeSort : list alpha -> list alpha
+----------------------------------------------------------------------
+Descrição:
+  Classificação recursiva baseada em divisão e intercalação.
+
+Exemplos:
+  mergeSort([7, 3, 9, 1]); → [1, 3, 7, 9]
+  mergeSort(["C", "A", "B"]); → ["A", "B", "C"]
+
+
+----------------------------------------------------------------------
+oddEvenSort : list alpha -> list alpha
+----------------------------------------------------------------------
+Descrição:
+  Classificação baseada em comparações alternadas entre posições
+  pares e ímpares.
+
+Exemplos:
+  oddEvenSort([7, 3, 9, 1]); → [1, 3, 7, 9]
+  oddEvenSort(["C", "A", "B"]); → ["A", "B", "C"]
+
+
+----------------------------------------------------------------------
+quickSort : list alpha -> list alpha
+----------------------------------------------------------------------
+Descrição:
+  Classificação recursiva baseada em pivô e particionamento.
+
+Exemplos:
+  quickSort([7, 3, 9, 1]); → [1, 3, 7, 9]
+  quickSort(["C", "A", "B"]); → ["A", "B", "C"]
+
+
+----------------------------------------------------------------------
+selectionSort : list alpha -> list alpha
+----------------------------------------------------------------------
+Descrição:
+  Classificação por seleção sucessiva do menor elemento.
+
+Exemplos:
+  selectionSort([7, 3, 9, 1]); → [1, 3, 7, 9]
+  selectionSort(["C", "A", "B"]); → ["A", "B", "C"]
+
+
+----------------------------------------------------------------------
+treeSort : list alpha -> list alpha
+----------------------------------------------------------------------
+Descrição:
+  Classificação baseada em árvore binária de busca.
+
+Exemplos:
+  treeSort([7, 3, 9, 1]); → [1, 3, 7, 9]
+  treeSort(["C", "A", "B"]); → ["A", "B", "C"]
+
+
+======================================================================
+FIM DO MANUAL
+======================================================================
