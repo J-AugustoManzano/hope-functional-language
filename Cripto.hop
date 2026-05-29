@@ -1,0 +1,360 @@
+! ------------------------------------------------------------------------------------- !
+!                                                                                       !
+! Módulo Hope .........: Cripto.hop                                                     !
+! Versão ..............: 1.0                                                            !
+! Objetivo ............: Algorimos de classificação de dados                            !
+! Dependência .........: Prelude.hop                                                    !
+! Copyright ...........: (c) Augusto Manzano, 2026                                      !
+! Licença .............: Creative Commons CC CC BY-NC-SA 4.0                            !
+!                        https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.pt !
+!                                                                                       !
+! ------------------------------------------------------------------------------------- !   
+
+
+! !!! =========================================================== !!! !
+! !!! CONFIGURAÇÃO AMBIENTE BÁSCIO DE TRABALHO                    !!! !
+! !!! =========================================================== !!! !
+
+uses prelude;
+
+
+! !!! =========================================================== !!! !
+! !!! INTERFACE PÚBLICA                                           !!! !
+! !!! =========================================================== !!! !
+
+dec decryptAlbam : list char -> list char;
+dec decryptAtbah : list char -> list char;
+dec decryptAtbash : list char -> list char;
+dec decryptAvgad : list char -> list char;
+dec decryptCaesar : list char # num -> list char;
+dec decryptColumnar : list char -> list char;
+dec decryptPolibio : list num -> list char;
+dec decryptRailFence : list char # num -> list char;
+dec decryptVigenere : list char # list char -> list char;
+dec encryptAlbam : list char -> list char;
+dec encryptAtbah : list char -> list char;
+dec encryptAtbash : list char -> list char;
+dec encryptAvgad : list char -> list char;
+dec encryptCaesar : list char # num -> list char;
+dec encryptColumnar : list char -> list char;
+dec encryptPolibio : list char -> list num;
+dec encryptRailFence : list char # num -> list char;
+dec encryptVigenere : list char # list char -> list char;
+
+private;
+
+! !!! =========================================================== !!! !
+! !!! FUNÇÕES DE SUPORTE INTERNAS                                 !!! !
+! !!! =========================================================== !!! !
+
+dec charToNum : char -> num ;
+--- charToNum(c) <= ord(c) - 65;
+
+dec numToChar : num -> char ;
+--- numToChar(n) <= chr(n + 65);
+
+dec adjustEncrypt : num -> num ;
+--- adjustEncrypt(n) <= if n > 8 then n - 1 else n;
+
+dec adjustDecrypt : num -> num ;
+--- adjustDecrypt(adj) <= if adj >= 9 then adj + 1 else adj;
+
+dec updateRails : list (list char) # num # char -> list (list char);
+--- updateRails([], _, _) <= [];
+--- updateRails(r :: rs, 0, c) <= (r <> [c]) :: rs;
+--- updateRails(r :: rs, n, c) <= r :: updateRails(rs, n - 1, c);
+
+dec buildRails : list char # num # num # num # list (list char) -> list (list char);
+--- buildRails([], _, _, _, rails) <= rails;
+--- buildRails(x :: xs, n, i, dir, rails) <=
+        let updated == updateRails(rails, i, x) in
+        let nextDir == if i = n - 1 then 0-1 else if i = 0 then 1 else dir in
+        let nextIdx == i + nextDir in
+        buildRails(xs, n, nextIdx, nextDir, updated);
+        
+dec concatRails : list (list char) -> list char;
+--- concatRails([]) <= [];
+--- concatRails(r :: rs) <= r <> concatRails(rs);
+
+dec consumeRail : list (list char) # num -> list (list char);
+--- consumeRail(r :: rs, 0) <= tail(r) :: rs;
+--- consumeRail(r :: rs, n) <= r :: consumeRail(rs, n - 1);
+        
+dec countRail : list num # num -> num;
+
+--- countRail([], _) <= 0;
+--- countRail(x :: xs, r) <=
+        if x = r
+        then 1 + countRail(xs, r)
+        else countRail(xs, r);
+
+dec fillPattern : list char # list num -> list char;
+--- fillPattern([], _) <= [];
+--- fillPattern(xs, i :: is) <= pick(xs, i) :: fillPattern(xs, is);
+
+dec interleave : list char # list char -> list char;
+--- interleave(nil, nil) <= nil;
+--- interleave(nil, y :: ys) <= y :: ys;
+--- interleave(x :: xs, nil) <= x :: xs;
+--- interleave(x :: xs, y :: ys) <= x :: y :: interleave(xs, ys);
+
+dec lowerRail : list char -> list char;
+--- lowerRail(nil) <= nil;
+--- lowerRail(x :: nil) <= nil;
+--- lowerRail(x :: y :: xs) <= y :: lowerRail(xs);
+
+dec makeRails : num -> list (list char);
+--- makeRails(0) <= [];
+--- makeRails(n) <= [] :: makeRails(n - 1);
+
+dec nth : list alpha # num -> alpha;
+--- nth(x :: xs, 0) <= x;
+--- nth(x :: xs, n) <= nth(xs, n - 1);
+
+dec railChar : list (list char) # num -> char;
+--- railChar(r :: rs, 0) <= head(r);
+--- railChar(r :: rs, n) <= railChar(rs, n - 1);
+
+dec railEncode : list char # num # num # num # list (list char) -> list char;
+--- railEncode([], _, _, _, rails) <= flatten(rails);
+--- railEncode(x :: xs, n, i, dir, rails) <=
+        let updated == updateRails(rails, i, x) in
+        let nextDir == if i = n - 1 then 0-1 else if i = 0 then 1 else dir in
+        let nextIdx == i + nextDir in
+        railEncode(xs, n, nextIdx, nextDir, updated);
+        
+dec railPattern : num # num # num # num -> list num;
+--- railPattern(0, _, _, _) <= [];
+--- railPattern(len, rails, row, dir) <=
+        row ::
+        railPattern(
+            len - 1,
+            rails,
+            if row = rails - 1 then row - 1
+            else if row = 0 then row + 1
+            else row + dir,
+            if row = rails - 1 then 0-1
+            else if row = 0 then 1
+            else dir
+        );
+
+dec rebuild : list num # list (list char) -> list char;
+--- rebuild([], _) <= [];
+--- rebuild(r :: rs, rails) <=
+        railChar(rails, r) ::
+        rebuild(rs, consumeRail(rails, r));
+
+dec removeNth : list alpha # num -> list alpha;
+--- removeNth(x :: xs, 0) <= xs;
+--- removeNth(x :: xs, n) <= x :: removeNth(xs, n - 1);
+
+dec takeChars : num # list char -> list char;
+--- takeChars(0, _) <= [];
+--- takeChars(_, []) <= [];
+--- takeChars(n, x :: xs) <= x :: takeChars(n - 1, xs);
+
+dec upperRail : list char -> list char;
+--- upperRail(nil) <= nil;
+--- upperRail(x :: nil) <= x :: nil;
+--- upperRail(x :: y :: xs) <= x :: upperRail(xs);
+
+dec splitHalf : num # list char -> list char # list char;
+--- splitHalf(0, xs) <= (nil, xs);
+--- splitHalf(n, nil) <= (nil, nil);
+--- splitHalf(n, x :: xs) <= 
+        let (esquerda, direita) == splitHalf(n - 1, xs) in
+        (x :: esquerda, direita);
+
+dec sumChars : list char -> num;
+--- sumChars([]) <= 0;
+--- sumChars(x :: xs) <= ord(x) + sumChars(xs);
+
+dec countSpaces : list char -> num;
+--- countSpaces([]) <= 0;
+--- countSpaces(' ' :: xs) <= 1 + countSpaces(xs);
+--- countSpaces(x :: xs) <= countSpaces(xs);
+
+dec bestCols : list char -> num;
+--- bestCols(msg) <=
+        let len == length(msg) in
+        let soma == sumChars(msg) in
+        let espacos == countSpaces(msg) in
+        let seed == (soma + espacos + len) mod 7 in
+        if len < 10 then
+            2 + (seed mod 2)
+        else if len < 30 then
+            3 + (seed mod 3)
+        else if len < 80 then
+            4 + (seed mod 4)
+        else
+            5 + (seed mod 5);
+
+dec takeColumn : list char # num # num -> list char;
+--- takeColumn([], _, _) <= [];
+--- takeColumn(x :: xs, 0, step) <=
+        x :: takeColumn(drop(step - 1, xs), 0, step);
+--- takeColumn(x :: xs, n, step) <=
+        takeColumn(xs, n - 1, step);
+
+dec buildColumns : list char # num # num -> list char;
+--- buildColumns(msg, cols, col) <=
+        if col = cols
+        then []
+        else
+            takeColumn(msg, col, cols)
+            <>
+            buildColumns(msg, cols, col + 1);
+
+dec splitColumns : list char # num # num # num -> list (list char);
+--- splitColumns(msg, len, cols, col) <=
+        if col = cols
+        then []
+        else
+            let base == len div cols in
+            let extra == if col < (len mod cols) then 1 else 0 in
+            let size == base + extra in
+            let part == take(size, msg) in
+            let rest == drop(size, msg) in
+            part :: splitColumns(rest, len, cols, col + 1);
+
+dec tailSafe : list alpha -> list alpha;
+--- tailSafe([]) <= [];
+--- tailSafe(x :: xs) <= xs;
+
+dec rebuildColumns : list (list char) -> list char;
+--- rebuildColumns(cols) <=
+        if flatten(cols) = []
+        then []
+        else
+            heads(cols)
+            <>
+            rebuildColumns(map(tailSafe, cols)); 
+   
+dec splitRails : list char # list num # num -> list (list char);
+--- splitRails(msg, pattern, rail) <=
+        if rail < 0
+        then []
+        else
+            let qtd == countRail(pattern, rail) in
+            let part == takeChars(qtd, msg) in
+            let rest == drop(qtd, msg) in
+            splitRails(rest, pattern, rail - 1) <> [part];
+        
+! !!! =========================================================== !!! !
+! !!! FUNÇÕES COMPLEMENTARES                                      !!! !
+! !!! =========================================================== !!! !
+
+--- encryptAtbash(nil) <= nil;
+--- encryptAtbash(x :: xs) <= 
+        if x = ' ' 
+        then ' ' :: encryptAtbash(xs)
+        else numToChar(25 - charToNum(x)) :: encryptAtbash(xs);  
+        
+--- decryptAtbash(nil) <= nil;
+--- decryptAtbash(x :: xs) <= 
+        if x = ' ' 
+        then ' ' :: decryptAtbash(xs)
+        else numToChar(25 - charToNum(x)) :: decryptAtbash(xs);  
+        
+--- encryptAlbam(nil) <= nil;
+--- encryptAlbam(x :: xs) <= 
+        if x = ' ' 
+        then ' ' :: encryptAlbam(xs)
+        else numToChar((charToNum(x) + 13) mod 26) :: encryptAlbam(xs);        
+            
+--- decryptAlbam(nil) <= nil;
+--- decryptAlbam(x :: xs) <= 
+        if x = ' ' 
+        then ' ' :: decryptAlbam(xs)
+        else numToChar((charToNum(x) + 13) mod 26) :: decryptAlbam(xs);
+
+--- encryptAtbah(nil) <= nil;
+--- encryptAtbah(x :: xs) <= 
+        if x = ' ' 
+        then ' ' :: encryptAtbah(xs)
+        else let n == charToNum(x) in
+            if n =< 8 then numToChar(8 - n) :: encryptAtbah(xs)
+            else if n =< 17 
+                then numToChar(26 - n) :: encryptAtbah(xs)
+                else numToChar(43 - n) :: encryptAtbah(xs);
+                
+--- decryptAtbah(nil) <= nil;
+--- decryptAtbah(x :: xs) <= 
+        if x = ' ' 
+        then ' ' :: decryptAtbah(xs)
+        else let n == charToNum(x) in
+            if n =< 8 
+            then numToChar(8 - n) :: decryptAtbah(xs)
+            else if n =< 17 
+                 then numToChar(26 - n) :: decryptAtbah(xs)
+                 else numToChar(43 - n) :: decryptAtbah(xs);
+
+--- encryptAvgad(nil) <= nil;
+--- encryptAvgad(x :: xs) <= 
+        if x = ' ' 
+        then ' ' :: encryptAvgad(xs)
+        else numToChar((charToNum(x) + 1) mod 26) :: encryptAvgad(xs);
+
+--- decryptAvgad(nil) <= nil;
+--- decryptAvgad(x :: xs) <= 
+        if x = ' ' 
+        then ' ' :: decryptAvgad(xs)
+        else numToChar((charToNum(x) + 25) mod 26) :: decryptAvgad(xs);
+
+--- encryptCaesar(nil, d) <= nil;
+--- encryptCaesar(x :: xs, d) <= 
+        if x = ' ' 
+        then ' ' :: encryptCaesar(xs, d)
+        else numToChar((charToNum(x) + d) mod 26) :: encryptCaesar(xs, d);
+        
+--- decryptCaesar(nil, d) <= nil;
+--- decryptCaesar(x :: xs, d) <= 
+        if x = ' ' 
+        then ' ' :: decryptCaesar(xs, d)
+        else numToChar((charToNum(x) - d + 26) mod 26) :: decryptCaesar(xs, d);         
+
+--- encryptColumnar(msg) <= buildColumns(msg, bestCols(msg), 0);
+
+--- decryptColumnar(nil) <= nil;
+--- decryptColumnar(msg) <=
+        let cols == bestCols(msg) in
+        let parts == splitColumns(msg, length(msg), cols, 0) in
+        rebuildColumns(parts);
+                    
+--- encryptPolibio(nil) <= nil;
+--- encryptPolibio(x :: xs) <= 
+        if x = ' ' 
+        then 0 :: encryptPolibio(xs)
+        else 
+            let adj == adjustEncrypt(charToNum(x)) in
+            ((adj div 5) + 1) :: ((adj mod 5) + 1) :: encryptPolibio(xs);
+
+--- decryptPolibio(nil) <= nil;
+--- decryptPolibio(0 :: xs) <= ' ' :: decryptPolibio(xs);
+--- decryptPolibio(l :: c :: xs) <=
+        let adj == (l - 1) * 5 + (c - 1) in
+        numToChar(adjustDecrypt(adj)) :: decryptPolibio(xs);
+
+--- encryptRailFence([], _) <= [];
+--- encryptRailFence(msg, n) <= concatRails(buildRails(msg, n, 0, 1, makeRails(n)));
+
+--- decryptRailFence([], _) <= [];
+--- decryptRailFence(msg, n) <=
+        let pattern == railPattern(length(msg), n, 0, 1) in
+        let rails == reverse(splitRails(msg, pattern, n - 1)) in
+        rebuild(pattern, rails);
+
+--- encryptVigenere ([], _) <= [];
+--- encryptVigenere (x :: xs, k :: ks) <= 
+        if x = ' ' 
+        then ' ' :: encryptVigenere(xs, k :: ks)
+        else numToChar((charToNum(x) + charToNum(k)) mod 26) 
+            :: encryptVigenere(xs, ks <> [k]);
+
+--- decryptVigenere ([], _) <= [];
+--- decryptVigenere (x :: xs, k :: ks) <= 
+        if x = ' ' 
+        then ' ' :: decryptVigenere(xs, k :: ks)
+        else numToChar((charToNum(x) - charToNum(k) + 26) mod 26) 
+            :: decryptVigenere(xs, ks <> [k]);
+            
