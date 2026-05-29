@@ -1,0 +1,164 @@
+! ------------------------------------------------------------------------------------- !
+!                                                                                       !
+! Módulo Hope .........: Sort.hop                                                       !
+! Dependência .........: Prelude.hop                                                    !
+! Versão ..............: 1.0                                                            !
+! Objetivo ............: Fornecer um conjunto de funcionalidades de classificação       !
+! Copyright ...........: (c) Augusto Manzano, 2026                                      !
+! Licença .............: Creative Commons CC CC BY-NC-SA 4.0                            !
+!                        https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.pt !
+!                                                                                       !
+! ------------------------------------------------------------------------------------- !
+
+data MyTree(alpha) == Empty ++ Node(MyTree(alpha) # alpha # MyTree(alpha));
+
+uses Prelude;
+
+! !!! =========================================================== !!! !
+! !!! ALGORITMOS DE CLASSIFICAÇÃO                                 !!! !
+! !!! =========================================================== !!! !
+
+dec bitonicSort : list alpha -> list alpha;
+dec bubbleSort : list alpha -> list alpha;
+dec cycleSort : list alpha -> list alpha;
+dec combSort : list alpha -> list alpha;
+dec gnomeSort : list alpha -> list alpha;
+dec insertionSort : list alpha -> list alpha;
+dec mergeSort : list alpha -> list alpha;
+dec oddEvenSort : list alpha -> list alpha;
+dec quickSort : list alpha -> list alpha;
+dec selectionSort : list alpha -> list alpha;
+dec treeSort : list alpha -> list alpha;
+
+private;
+
+
+! !!! =========================================================== !!! !
+! !!! FUNÇÕES AUXILIARES                                          !!! !
+! !!! =========================================================== !!! !
+
+dec bubble : list alpha -> list alpha;
+--- bubble [] <= [];
+--- bubble [x] <= [x];
+--- bubble (x::y::xs) <= if x > y then y :: bubble (x::xs) else x :: bubble (y::xs);
+
+dec countLess : alpha # list alpha -> num;
+--- countLess (val, []) <= 0;
+--- countLess (val, x::xs) <= (if x < val then 1 else 0) + countLess (val, xs);
+
+dec gnomeAux : list alpha # list alpha -> list alpha;
+--- gnomeAux ([], atras) <= reverse atras;
+--- gnomeAux (x::xs, []) <= gnomeAux (xs, [x]);
+--- gnomeAux (x::xs, a::atras) <= if x =< a then gnomeAux (xs, a::x::atras) else gnomeAux (xs, x::a::atras);
+
+dec oddPass : list alpha -> list alpha;
+--- oddPass [] <= [];
+--- oddPass [x] <= [x];
+--- oddPass (x::y::xs) <= if x > y then y::x::oddPass xs else x::y::oddPass xs;
+
+dec isSorted : list alpha -> truval;
+--- isSorted [] <= true;
+--- isSorted [x] <= true;
+--- isSorted (x::y::xs) <= (x =< y) and isSorted (y::xs);
+
+
+! !!! =========================================================== !!! !
+! !!! CLASSIFICAÇÕES (SORT)                                       !!! !
+! !!! =========================================================== !!! !
+
+!! 1. Bitonic Sort
+--- bitonicSort [] <= [];
+--- bitonicSort [x] <= [x];
+--- bitonicSort xs <= merge (bitonicSort (take (length xs div 2, xs)), bitonicSort (drop (length xs div 2, xs)));
+
+!! 2. Bubble Sort
+--- bubbleSort xs <= if xs = bubble xs then xs else bubbleSort (bubble xs);
+
+!! 3. Cycle Sort
+dec getAt : num # list alpha -> alpha;
+--- getAt (0, x::xs) <= x;
+--- getAt (n, x::xs) <= getAt (n - 1, xs);
+
+dec replaceAt : alpha # num # list alpha -> list alpha;
+--- replaceAt (val, 0, x::xs) <= val :: xs;
+--- replaceAt (val, n, x::xs) <= x :: replaceAt (val, n - 1, xs);
+
+dec countSmaller : alpha # list alpha -> num;
+--- countSmaller (v, []) <= 0;
+--- countSmaller (v, x::xs) <= (if x < v then 1 else 0) + countSmaller (v, xs);
+
+dec cycleAux : list alpha # num -> list alpha;
+--- cycleAux (xs, pos) <= 
+      if pos >= length xs then xs
+      else cycleAux (replaceAt (getAt (pos, xs), countSmaller (getAt (pos, xs), xs), xs), pos + 1);
+
+--- cycleSort [] <= [];
+--- cycleSort xs <= cycleAux (xs, 0);
+
+!! 4. Comb Sort
+--- combSort xs <= if xs = bubble xs then xs else combSort (bubble (bubble xs));
+
+!! 5. Gnome Sort
+--- gnomeSort xs <= gnomeAux (xs, []);
+
+!! 6. Insertion Sort
+--- insertionSort [] <= [];
+--- insertionSort (x::xs) <= insert (x, insertionSort xs);
+
+!! 7. Merge Sort
+--- mergeSort [] <= [];
+--- mergeSort [x] <= [x];
+--- mergeSort xs <= merge (mergeSort ys, mergeSort zs) where (ys, zs) == split xs;
+
+!! 8. Odd-Even Sort
+--- oddEvenSort xs <= if xs = oddPass xs then xs else oddEvenSort (oddPass xs);
+
+!! 9. Quick Sort
+dec menores : alpha # list alpha -> list alpha;
+--- menores (p, []) <= [];
+--- menores (p, x::xs) <= if x < p then x :: menores(p, xs) else menores(p, xs);
+
+dec maiores : alpha # list alpha -> list alpha;
+--- maiores (p, []) <= [];
+--- maiores (p, x::xs) <= if x >= p then x :: maiores(p, xs) else maiores(p, xs);
+
+--- quickSort [] <= [];
+--- quickSort (x::xs) <= quickSort (menores(x, xs)) <> [x] <> quickSort (maiores(x, xs));
+
+!! 10. Selection Sort
+--- selectionSort [] <= [];
+--- selectionSort xs <= least :: selectionSort rest where (least, rest) == select xs;
+
+!! 11. Tree Sort
+dec insertMyTree : alpha # MyTree(alpha) -> MyTree(alpha);
+--- insertMyTree (v, Empty) <= Node(Empty, v, Empty);
+--- insertMyTree (v, Node(l, x, r)) <= 
+      if v < x then Node(insertMyTree(v, l), x, r) 
+      else Node(l, x, insertMyTree(v, r));
+
+dec buildMyTree : list alpha # MyTree(alpha) -> MyTree(alpha);
+--- buildMyTree ([], t) <= t;
+--- buildMyTree (x::xs, t) <= buildMyTree (xs, insertMyTree(x, t));
+
+dec flattenMyTree : MyTree(alpha) -> list alpha;
+--- flattenMyTree (Empty) <= [];
+--- flattenMyTree (Node(l, x, r)) <= flattenMyTree(l) <> [x] <> flattenMyTree(r);
+
+--- treeSort (xs) <= flattenMyTree (buildMyTree (xs, Empty));
+
+
+!! Teste Unificado
+!! let nomes == ["Zeca", "Ana", "Bia", "Carlos", "Duda"] in
+!! (
+!!   bitonicSort(nomes),
+!!   bubbleSort(nomes),
+!!   cycleSort(nomes),
+!!   combSort(nomes),
+!!   gnomeSort(nomes),
+!!   insertionSort(nomes),
+!!   mergeSort(nomes),
+!!   oddEvenSort(nomes),
+!!   quickSort(nomes),
+!!   selectionSort(nomes),
+!!   treeSort(nomes)
+!! );
