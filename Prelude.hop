@@ -1,8 +1,8 @@
 ! ------------------------------------------------------------------------------------- !
 !                                                                                       !
-! Módulo Hope .........: Prelude.hop (Código Corrigido - Sem Duplicações)               !
+! Módulo Hope .........: Prelude.hop                                                    !
 ! Simulação Haskell ...: Prelude/Data.List/List                                         !
-! Versão ..............: 5.4                                                            !
+! Versão ..............: 5.6                                                            !
 ! Objetivo ............: Simulação base Haskell em Hope com precedência garantida       !
 ! Copyright ...........: (c) Augusto Manzano, 2026                                      !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0                            !
@@ -132,6 +132,7 @@ dec rangeLst : num # num # num -> list num;
 dec reduce : list alpha # (alpha # alpha -> alpha) # alpha -> alpha;
 dec remove : alpha # list alpha -> list alpha;
 dec repeat : alpha -> list alpha;
+dec replace : num # alpha # list alpha -> list alpha;
 dec replic : list alpha # num -> list alpha;
 dec replicate : num # alpha -> list alpha;
 dec reverse : list alpha -> list alpha;
@@ -143,9 +144,11 @@ dec scanl1 : (alpha # alpha -> alpha) # list alpha -> list alpha;
 dec scanr : (alpha # beta -> beta) # beta # list alpha -> list beta;
 dec scanr1 : (alpha # alpha -> alpha) # list alpha -> list alpha;
 dec segs : list alpha -> list (list alpha);
+dec select : list alpha -> alpha # list alpha;
 dec setBuilderNotation : list alpha # (alpha -> truval) -> list alpha;
 dec singleton : alpha -> list alpha;
 dec slice : num # num # list num -> list num;
+dec split : list alpha -> list alpha # list alpha;
 dec sort : list alpha -> list alpha;
 dec sortBy : (alpha # alpha -> relation) # list alpha -> list alpha;
 dec sortOn : (alpha -> beta) # list alpha -> list alpha;
@@ -463,6 +466,10 @@ dec wordsAux : list char -> list(list char);
 --- stripPrefix (_, []) <= Nothing;
 --- stripPrefix (x :: xs, y :: ys) <= if x = y then stripPrefix (xs, ys) else Nothing;
 
+--- split [] <= ([], []);
+--- split [x] <= ([x], []);
+--- split (x::y::zs) <= (x::xs, y::ys) where (xs, ys) == split zs;
+
 --- mapAccumL (_, acc, []) <= (acc, []);
 --- mapAccumL (f, acc, x :: xs) <= let (acc1, y) == f (acc, x) in let (acc2, ys) == mapAccumL (f, acc1, xs) in (acc2, y :: ys);
 
@@ -480,6 +487,12 @@ dec wordsAux : list char -> list(list char);
 
 --- encodeBase (n, x, []) <= [(n, x)];
 --- encodeBase (n, x, y :: ys) <= if x = y then encodeBase (n + 1, x, ys) else (n, x) :: encodeBase (1, y, ys);
+
+--- select [x] <= (x, []);
+--- select (x :: xs) <= 
+    if x < least then (x, xs) 
+    else (least, x :: rest)
+    where (least, rest) == select xs;
 
 --- span (f, []) <= ([], []);
 --- span (f, x :: xs) <= if f x then (x :: f, a) where (f, a) == span (f, xs) else ([], x :: xs);
@@ -689,9 +702,11 @@ dec sortAux : list alpha # list alpha -> list alpha;
 --- sort xs <= sortAux (xs, []);
 
 --- merge ([], []) <= [];
---- merge (a, []) <= a;
---- merge ([], b) <= b;
---- merge (a :: ax, b) <= a :: merge (ax, b);
+--- merge (xs, []) <= xs;
+--- merge ([], ys) <= ys;
+--- merge (x :: xs, y :: ys) <= if x =< y
+                                then x :: merge (xs, y :: ys)
+                                else y :: merge (x :: xs, ys);
 
 --- union (a, b) <= sort (nub (merge (a, b)));
 
