@@ -2,7 +2,7 @@
 !                                                                                       !
 ! Módulo Hope .........: Prelude.hop                                                    !
 ! Simulação Haskell ...: Prelude/Data.List/List                                         !
-! Versão ..............: 5.6                                                            !
+! Versão ..............: 5.7                                                            !
 ! Objetivo ............: Simulação base Haskell em Hope com precedência garantida       !
 ! Copyright ...........: (c) Augusto Manzano, 2026                                      !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0                            !
@@ -66,6 +66,7 @@ dec final : num # list alpha -> list alpha;
 dec find : (alpha -> truval) # list alpha -> Maybe alpha;
 dec findIndex : (alpha -> truval) # list alpha -> Maybe num;
 dec findIndices : (alpha -> truval) # list alpha -> list num;
+dec flatten : list (list num) -> list num;
 dec flip : (alpha # beta -> gamma) # beta # alpha -> gamma;
 dec foldl : (alpha # beta -> alpha) # alpha # list beta -> alpha;
 dec foldl1 : (alpha # alpha -> alpha) # list alpha -> alpha;
@@ -132,7 +133,8 @@ dec rangeLst : num # num # num -> list num;
 dec reduce : list alpha # (alpha # alpha -> alpha) # alpha -> alpha;
 dec remove : alpha # list alpha -> list alpha;
 dec repeat : alpha -> list alpha;
-dec replace : num # alpha # list alpha -> list alpha;
+dec replace : alpha # alpha # list alpha -> list alpha;
+dec replaceAt : num # alpha # list alpha -> list alpha;
 dec replic : list alpha # num -> list alpha;
 dec replicate : num # alpha -> list alpha;
 dec reverse : list alpha -> list alpha;
@@ -200,7 +202,7 @@ dec zipWith7 : (alpha # beta # gamma # delta # epsilon # dzeta # eta -> teta) # 
 
 
 ! !!! =========================================================== !!! !
-! !!! FUNÇÕES DE SUPORTE INTERNAS                                 !!!
+! !!! FUNÇÕES DE SUPORTE INTERNAS                                 !!! !
 ! !!! =========================================================== !!! !
 
 private;
@@ -240,6 +242,9 @@ dec findIndexAux : (alpha -> truval) # list alpha # num -> Maybe num;
 dec foldr1_dep : (alpha # alpha -> alpha) # list alpha -> alpha;
 --- foldr1_dep (f, [x]) <= x;
 --- foldr1_dep (f, x :: xs) <= f (x, foldr1_dep (f, xs));
+
+--- flatten ([]) <= [];
+--- flatten (x::xs) <= x <> flatten xs;
 
 dec mapM_ : (alpha -> beta) # list alpha -> list beta;
 --- mapM_ (_, []) <= [];
@@ -342,6 +347,13 @@ dec wordsAux : list char -> list(list char);
 --- rangeLst (i, f, p) <= if i > f then [] else i :: rangeLst (i + p, f, p);
 
 --- repeat x <= x :: repeat x;
+
+--- replace (old, new, []) <= [];
+--- replace (old, new, x::xs) <= if x = old then new :: replace (old, new, xs) else x :: replace (old, new, xs);
+
+--- replaceAt (n, new, []) <= [];
+--- replaceAt (0, new, x :: xs) <= new :: xs;
+--- replaceAt (n, new, x :: xs) <= x :: replaceAt (n - 1, new, xs);
 
 --- singleton a <= a :: [];
 
