@@ -1,0 +1,119 @@
+======================================================================
+MANUAL DE USO — MÓDULO CRIPTO.HOP
+Augusto Manzano (C) 2026 - v# 1.0
+======================================================================
+
+----------------------------------------------------------------------
+encryptAtbash : list char -> list char
+decryptAtbash : list char -> list char
+----------------------------------------------------------------------
+Descrição:
+  Substituição simétrica (A↔Z, B↔Y...). 
+  Mesma função para criptografar e descriptografar.
+
+Exemplos:
+  encryptAtbash("AUGUSTO MANZANO"); → "ZFTFHGL NZMAZML"
+  decryptAtbash("ZFTFHGL NZMAZML"); → "AUGUSTO MANZANO"
+
+
+----------------------------------------------------------------------
+encryptAlbam : list char -> list char
+decryptAlbam : list char -> list char
+----------------------------------------------------------------------
+Descrição:
+  ROT13 (deslocamento fixo de 13 posições no alfabeto).
+
+Exemplos:
+  encryptAlbam("AUGUSTO MANZANO"); → "NHTHFGB ZNAMNAB"
+  decryptAlbam("NHTHFGB ZNAMNAB"); → "AUGUSTO MANZANO"
+
+
+----------------------------------------------------------------------
+encryptAtbah : list char -> list char
+decryptAtbah : list char -> list char
+----------------------------------------------------------------------
+Descrição:
+  Substituição segmentada do alfabeto com inversões parciais por blocos.
+
+Exemplos:
+  encryptAtbah("AUGUSTO MANZANO"); → "IXCXZYM OINSINM"
+  decryptAtbah("IXCXZYM OINSINM"); → "AUGUSTO MANZANO"
+
+
+----------------------------------------------------------------------
+encryptAvgad : list char -> list char
+decryptAvgad : list char -> list char
+----------------------------------------------------------------------
+Descrição:
+  Deslocamento circular simples: +1 para cifrar, -1 para decifrar.
+
+Exemplos:
+- Inteiros:
+  encryptAvgad("AUGUSTO MANZANO"); → "BCD"
+  decryptAvgad("BVHVTUP NBOABOP"); → "AUGUSTO MANZANO"
+
+
+----------------------------------------------------------------------
+encryptCaesar : list char # num -> list char
+decryptCaesar : list char # num -> list char
+----------------------------------------------------------------------
+Descrição:
+  Cifra de César com deslocamento fixo definido pelo usuário.
+
+Exemplos:
+  encryptCaesar("AUGUSTO MANZANO", 3); → "DXJXVWR PDQCDQR"
+  decryptCaesar("DXJXVWR PDQCDQR", 3); → "AUGUSTO MANZANO"
+
+
+----------------------------------------------------------------------
+encryptColumnar : list char -> list char
+decryptColumnar : list char -> list char
+----------------------------------------------------------------------
+Descrição:
+  Transposição colunar com largura variável calculada a partir do 
+  tamanho da mensagem.
+
+Exemplos:
+  encryptColumnar("AUGUSTO MANZANO"); → "ATNUOZG AUMNSAO"
+  decryptColumnar("ATNUOZG AUMNSAO"); → "AUGUSTO MANZANO"
+
+
+----------------------------------------------------------------------
+encryptPolibio : list char -> list num
+decryptPolibio : list num -> list char
+----------------------------------------------------------------------
+Descrição:
+  Substituição por coordenadas em matriz 5x5.
+
+Exemplos:
+  encryptPolibio("ABC"); → [1, 1, 1, 2, 1, 3]
+  decryptPolibio([1, 1, 1, 2, 1, 3]); → "ABC"
+
+
+----------------------------------------------------------------------
+dec encryptRailFence : list char # num -> list char;
+dec decryptRailFence : list char # num -> list char;
+----------------------------------------------------------------------
+Descrição:
+  Transposição em duas trilhas (Rail Fence simplificado).
+
+Exemplos:
+  encryptRailFence("AUGUSTO MANZANO", 3); → "ASMAUUT AZNGONO"
+  decryptRailFence("ASMAUUT AZNGONO", 3); → "AUGUSTO MANZANO"
+
+
+----------------------------------------------------------------------
+encryptVigenere : list char # list char -> list char
+decryptVigenere : list char # list char -> list char
+----------------------------------------------------------------------
+Descrição:
+  Cifra polialfabética baseada em chave repetida.
+
+Exemplos:
+  encryptVigenere("AUGUSTO MANZANO", "KEY"); → "KYEEWRY QYXDYXS"
+  decryptVigenere("KYEEWRY QYXDYXS", "KEY"); → "AUGUSTO MANZANO"
+
+
+======================================================================
+FIM DO MANUAL
+======================================================================
