@@ -2,7 +2,7 @@
 !                                                                                       !
 ! Módulo Hope .........: Sort.hop                                                       !
 ! Dependência .........: Prelude.hop                                                    !
-! Versão ..............: 1.0                                                            !
+! Versão ..............: 1.1                                                            !
 ! Objetivo ............: Fornecer um conjunto de funcionalidades de classificação       !
 ! Copyright ...........: (c) Augusto Manzano, 2026                                      !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0                            !
@@ -49,11 +49,6 @@ dec gnomeAux : list alpha # list alpha -> list alpha;
 --- gnomeAux (x::xs, []) <= gnomeAux (xs, [x]);
 --- gnomeAux (x::xs, a::atras) <= if x =< a then gnomeAux (xs, a::x::atras) else gnomeAux (xs, x::a::atras);
 
-dec oddPass : list alpha -> list alpha;
---- oddPass [] <= [];
---- oddPass [x] <= [x];
---- oddPass (x::y::xs) <= if x > y then y::x::oddPass xs else x::y::oddPass xs;
-
 dec isSorted : list alpha -> truval;
 --- isSorted [] <= true;
 --- isSorted [x] <= true;
@@ -73,25 +68,8 @@ dec isSorted : list alpha -> truval;
 --- bubbleSort xs <= if xs = bubble xs then xs else bubbleSort (bubble xs);
 
 !! 3. Cycle Sort
-dec getAt : num # list alpha -> alpha;
---- getAt (0, x::xs) <= x;
---- getAt (n, x::xs) <= getAt (n - 1, xs);
-
-dec replaceAt : alpha # num # list alpha -> list alpha;
---- replaceAt (val, 0, x::xs) <= val :: xs;
---- replaceAt (val, n, x::xs) <= x :: replaceAt (val, n - 1, xs);
-
-dec countSmaller : alpha # list alpha -> num;
---- countSmaller (v, []) <= 0;
---- countSmaller (v, x::xs) <= (if x < v then 1 else 0) + countSmaller (v, xs);
-
-dec cycleAux : list alpha # num -> list alpha;
---- cycleAux (xs, pos) <= 
-      if pos >= length xs then xs
-      else cycleAux (replaceAt (getAt (pos, xs), countSmaller (getAt (pos, xs), xs), xs), pos + 1);
-
 --- cycleSort [] <= [];
---- cycleSort xs <= cycleAux (xs, 0);
+--- cycleSort (x::xs) <= insert(x, cycleSort(xs));
 
 !! 4. Comb Sort
 --- combSort xs <= if xs = bubble xs then xs else combSort (bubble (bubble xs));
@@ -109,7 +87,16 @@ dec cycleAux : list alpha # num -> list alpha;
 --- mergeSort xs <= merge (mergeSort ys, mergeSort zs) where (ys, zs) == split xs;
 
 !! 8. Odd-Even Sort
---- oddEvenSort xs <= if xs = oddPass xs then xs else oddEvenSort (oddPass xs);
+dec oddEvenPass : list alpha # num -> list alpha;
+--- oddEvenPass([], _) <= [];
+--- oddEvenPass([x], _) <= [x];
+--- oddEvenPass(x::y::xs, 0) <= if x > y then y :: x :: oddEvenPass(xs, 0) else x :: y :: oddEvenPass(xs, 0);
+--- oddEvenPass(x::xs, 1) <= x :: oddEvenPass(xs, 0);
+--- oddEvenSort(xs) <= let ys == oddEvenPass(xs, 0) in
+                       let zs == oddEvenPass(ys, 1) in
+                       if zs = xs
+                       then zs
+                       else oddEvenSort(zs);
 
 !! 9. Quick Sort
 dec menores : alpha # list alpha -> list alpha;
