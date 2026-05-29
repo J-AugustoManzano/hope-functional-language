@@ -1,9 +1,14 @@
 ! ------------------------------------------------------------------------------------- !
 !                                                                                       !
 ! Módulo Hope .........: Prelude.hop                                                    !
-! Simulação Haskell ...: Prelude/Data.List/List                                         !
-! Versão ..............: 5.7                                                            !
-! Objetivo ............: Simulação base Haskell em Hope com precedência garantida       !
+! Simulação Haskell ...: Prelude                                                        !
+!                        Data.List                                                      !
+!                        Data.List.Extra                                                !
+!                        Data.Maybe                                                     !
+!                        Control.Monad                                                  !
+!                        Data.Set                                                       !
+! Versão ..............: 6.0                                                            !
+! Objetivo ............: Simulação bibliotecas Haskell (parcial)                        !
 ! Copyright ...........: (c) Augusto Manzano, 2026                                      !
 ! Licença .............: Creative Commons CC CC BY-NC-SA 4.0                            !
 !                        https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.pt !
@@ -15,7 +20,10 @@
 ! !!! CONFIGURAÇÃO AMBIENTE BÁSCIO DE TRABALHO                    !!! !
 ! !!! =========================================================== !!! !
 
+data Either alpha beta == Left alpha ++ Right beta;
 data Maybe alpha == Nothing ++ Just (alpha);
+data MyTree(alpha) == Empty ++ Node(MyTree(alpha) # alpha # MyTree(alpha));
+data Result alpha == Ok alpha ++ Error (list char);
 
 infixr \\ : 3;
 dec \\ : list alpha # list beta -> list (alpha # beta);
@@ -27,12 +35,16 @@ dec \\ : list alpha # list beta -> list (alpha # beta);
 
 dec after : num # list alpha -> list alpha;
 dec all : (alpha -> truval) # list alpha -> truval;
+dec allSame : list alpha -> truval;
 dec andList : list truval -> truval;
 dec any : (alpha -> truval) # list alpha -> truval;
+dec anySame : list alpha -> truval;
 dec between : alpha # list alpha -> list (list alpha);
 dec break : (alpha -> truval) # list alpha -> (list alpha # list alpha);
 dec breakApart : list alpha -> list alpha # list alpha;
+dec cartesianProduct : list (list alpha) -> list (list alpha);
 dec chunksOf : num # list alpha -> list (list alpha);
+dec combine : list alpha # list (list alpha) -> list (list alpha);
 dec combs : num # list alpha -> list (list alpha);
 dec compare : alpha # alpha -> relation;
 dec complement : list alpha # list alpha -> list alpha;
@@ -41,6 +53,7 @@ dec concat : list (list alpha) -> list alpha;
 dec concatMap : (alpha -> list beta) # list alpha -> list beta;
 dec const : alpha # beta -> alpha;
 dec coPrime : num # num -> truval;
+dec count : alpha # list alpha -> num;
 dec countBy : (alpha -> beta) # list alpha -> list (beta # num);
 dec curry : (alpha # beta -> gamma) -> alpha -> beta -> gamma;
 dec cycle : list alpha -> list alpha;
@@ -66,7 +79,7 @@ dec final : num # list alpha -> list alpha;
 dec find : (alpha -> truval) # list alpha -> Maybe alpha;
 dec findIndex : (alpha -> truval) # list alpha -> Maybe num;
 dec findIndices : (alpha -> truval) # list alpha -> list num;
-dec flatten : list (list num) -> list num;
+dec flatten : list (list alpha) -> list alpha;
 dec flip : (alpha # beta -> gamma) # beta # alpha -> gamma;
 dec foldl : (alpha # beta -> alpha) # alpha # list beta -> alpha;
 dec foldl1 : (alpha # alpha -> alpha) # list alpha -> alpha;
@@ -77,6 +90,7 @@ dec front : num # list alpha -> list alpha;
 dec getPos : alpha # list alpha -> num;
 dec group : list alpha -> list (list alpha);
 dec groupBy : (alpha # alpha -> truval) # list alpha -> list (list alpha);
+dec groupSort : list alpha -> list (list alpha);
 dec head : list alpha -> alpha;
 dec index : num # list num -> num;
 dec indexOf : list alpha # list alpha -> num;
@@ -104,10 +118,14 @@ dec mapAccumL : (alpha # beta -> alpha # gamma) # alpha # list beta -> alpha # l
 dec mapAccumR : (alpha # beta -> alpha # gamma) # alpha # list beta -> alpha # list gamma;
 dec maximum : list alpha -> alpha;
 dec maximumBy : (alpha # alpha -> relation) # list alpha -> alpha;
+dec maximumOn : (alpha -> num) # list alpha -> alpha;
 dec maybe : beta # (alpha -> beta) # Maybe alpha -> beta;
+dec member : alpha # list alpha -> truval;
 dec merge : list alpha # list alpha -> list alpha;
 dec minimum : list alpha -> alpha;
 dec minimumBy : (alpha # alpha -> relation) # list alpha -> alpha;
+dec minimumOn : (alpha -> num) # list alpha -> alpha;
+dec msort : list alpha -> list alpha;
 dec multiple : num # num -> truval;
 dec multTable' : num -> list (list char);
 dec multTable : num -> list (num # num # num);
@@ -122,6 +140,7 @@ dec packSort : list alpha -> list (list alpha);
 dec partition : (alpha -> truval) # list alpha -> list alpha # list alpha;
 dec perms : list alpha -> list (list alpha);
 dec permutations : list alpha -> list (list alpha);
+dec prependAll : alpha # list (list alpha) -> list (list alpha);
 dec primeFactors : num -> list num;
 dec primeLst : num # num -> list num;
 dec print : alpha -> alpha;
@@ -150,6 +169,7 @@ dec select : list alpha -> alpha # list alpha;
 dec setBuilderNotation : list alpha # (alpha -> truval) -> list alpha;
 dec singleton : alpha -> list alpha;
 dec slice : num # num # list num -> list num;
+dec snoc : list alpha # alpha -> list alpha;
 dec split : list alpha -> list alpha # list alpha;
 dec sort : list alpha -> list alpha;
 dec sortBy : (alpha # alpha -> relation) # list alpha -> list alpha;
@@ -157,6 +177,7 @@ dec sortOn : (alpha -> beta) # list alpha -> list alpha;
 dec span : (alpha -> truval) # list alpha -> list alpha # list alpha;
 dec splitAt : num # list alpha -> list alpha # list alpha;
 dec splitEvery : num # list alpha -> list (list alpha);
+dec splitOn : alpha # list alpha -> list (list alpha);
 dec start : num # list alpha -> list alpha;
 dec stripPrefix : list alpha # list alpha -> Maybe (list alpha);
 dec subsequences : list alpha -> list (list alpha);
@@ -178,6 +199,7 @@ dec union : list alpha # list alpha -> list alpha;
 dec unionBy : (alpha # alpha -> truval) # list alpha # list alpha -> list alpha;
 dec unique : list alpha -> list alpha;
 dec unlines : list (list char) -> list char;
+dec unsnoc : list alpha -> list alpha # alpha;
 dec until : (alpha -> truval) # (alpha -> alpha) # alpha -> alpha;
 dec unwords : list (list char) -> list char;
 dec unzip : list (alpha # beta) -> list alpha # list beta;
@@ -267,6 +289,10 @@ dec wordsAux : list char -> list(list char);
 --- all (_, [])      <= true;
 --- all (p, x :: xs) <= p x and all (p, xs);
 
+--- allSame [] <= true;
+--- allSame [x] <= true;
+--- allSame (x::y::xs) <= (x = y) and allSame (y::xs);
+
 --- any (_, [])      <= false;
 --- any (p, x :: xs) <= p x or any (p, xs);
 
@@ -279,6 +305,9 @@ dec wordsAux : list char -> list(list char);
 --- concat (x :: xs) <= x <> concat xs;
 
 --- const (x, _) <= x;
+
+--- count (x, []) <= 0;
+--- count (x, y::ys) <= if x = y then 1 + count (x, ys) else count (x, ys);
 
 --- curry f <= \ x => \ y => f(x, y);
 
@@ -312,6 +341,10 @@ dec wordsAux : list char -> list(list char);
 --- front (n, []) <= [];
 --- front (succ n, x :: xs) <= x :: front(n, xs);
 
+--- group [] <= [];
+--- group [x] <= [[x]];
+--- group (x::y::xs) <= if x = y then (x :: head (group (y::xs))) :: tail (group (y::xs)) else [x] :: group (y::xs);
+
 --- index (_, []) <= error "Index out of range!";
 --- index (0, x :: xs) <= x;
 --- index (n, x :: xs) <= index (n - 1, xs);
@@ -332,15 +365,37 @@ dec wordsAux : list char -> list(list char);
 
 --- many x <= xs whererec xs == x :: xs;
 
+--- maximumOn (f, [x]) <= x;
+--- maximumOn (f, x::y::xs) <= if f(x) >= f(y) then maximumOn (f, x::xs) else maximumOn (f, y::xs);
+
+--- minimumOn (f, [x]) <= x;
+--- minimumOn (f, x::y::xs) <= if f(x) =< f(y) then minimumOn (f, x::xs) else minimumOn (f, y::xs);
+
 --- maybe (def, f, Nothing)  <= def;
 --- maybe (def, f, Just (x)) <= f (x);
 
+--- merge ([], []) <= [];
+--- merge (xs, []) <= xs;
+--- merge ([], ys) <= ys;
+--- merge (x :: xs, y :: ys) <= if x =< y
+                                then x :: merge (xs, y :: ys)
+                                else y :: merge (x :: xs, ys);
+                                
+--- member (x, []) <= false;
+--- member (x, y::ys) <= if x = y then true else member (x, ys);
+
 --- multiple (n, m) <= n mod m = 0;
+
+--- nub [] <= [];
+--- nub (x::xs) <= if member(x, xs) then nub xs else x :: nub xs;
 
 --- null []       <= true;
 --- null (_ :: _) <= false;
 
 --- otherwise <= true;
+
+--- prependAll (x, []) <= [];
+--- prependAll (x, y::ys) <= (x :: y) :: prependAll (x, ys);
 
 --- random s <= pow (s * 15485863, 3) mod 2038074743 / 2038074743;
 
@@ -356,6 +411,12 @@ dec wordsAux : list char -> list(list char);
 --- replaceAt (n, new, x :: xs) <= x :: replaceAt (n - 1, new, xs);
 
 --- singleton a <= a :: [];
+
+--- snoc ([], x) <= [x];
+--- snoc (y::ys, x) <= y :: snoc (ys, x);
+
+--- splitOn (sep, []) <= [[]];
+--- splitOn (sep, x::xs) <= if x = sep then [] :: splitOn (sep, xs) else (x :: head (splitOn (sep, xs))) :: tail (splitOn (sep, xs));
 
 --- subtract (x, y) <= y - x;
 
@@ -374,6 +435,9 @@ dec wordsAux : list char -> list(list char);
 
 --- unlines [] <= [];
 --- unlines (x :: xs) <= x <> '\n' :: unlines xs;
+
+--- unsnoc [x] <= ([], x);
+--- unsnoc (x::xs) <= (x :: fst (unsnoc xs), snd (unsnoc xs));
 
 --- unzip [] <= ([], []);
 --- unzip ((a, b) :: xs) <= (a :: as, b :: bs) where (as, bs) == unzip xs;
@@ -518,6 +582,12 @@ dec afterWith : (alpha -> truval) -> list alpha -> list alpha;
 --- afterWith cond [] <= [];
 --- afterWith cond (x :: xs) <= if cond x then afterWith cond xs else x :: xs;
 
+--- anySame [] <= false;
+--- anySame (x::xs) <= member(x, xs) or anySame(xs);
+
+--- combine ([], ys) <= [];
+--- combine (x::xs, ys) <= prependAll (x, ys) <> combine (xs, ys);
+
 --- elem (x, [])      <= false;
 --- elem (x, y :: ys) <= x = y or elem (x, ys);
 
@@ -627,6 +697,9 @@ dec forM_ : list alpha # (alpha -> beta) -> list beta;
 ! NÍVEL 3: FUNÇÕES DE ALTA COMPLEXIDADE E DEPENDÊNCIA MÚLTIPLA        !
 ! =================================================================== !
 
+--- cartesianProduct [] <= [[]];
+--- cartesianProduct (xs::xss) <= combine (xs, cartesianProduct xss);
+
 dec proper_tails : list alpha -> list (list alpha);
 --- proper_tails [] <= [];
 --- proper_tails (x :: xs) <= tails xs;
@@ -656,6 +729,7 @@ dec diagonal : list alpha # list beta # list beta -> list (alpha # beta);
 
 --- slice (i, f, x) <= final (i, start (f, x));
 
+--- chunksOf (n, []) <= [];
 --- chunksOf (n, xs) <= if null ys then [xs'] else xs' :: chunksOf (n, ys) where (xs', ys) == splitAt (n, xs);
 
 --- splitEvery (_, []) <= [];
@@ -712,13 +786,12 @@ dec sortAux : list alpha # list alpha -> list alpha;
 --- sortAux (x :: xs, ys) <= sortAux (smaller, x :: sortAux (larger, ys)) where (smaller, larger) == partition ((\z => z < x), xs);
 
 --- sort xs <= sortAux (xs, []);
+                               
+--- msort [] <= [];
+--- msort [x] <= [x];
+--- msort xs <= merge (msort ys, msort zs) where (ys, zs) == split xs;
 
---- merge ([], []) <= [];
---- merge (xs, []) <= xs;
---- merge ([], ys) <= ys;
---- merge (x :: xs, y :: ys) <= if x =< y
-                                then x :: merge (xs, y :: ys)
-                                else y :: merge (x :: xs, ys);
+--- groupSort xs <= group (msort xs);
 
 --- union (a, b) <= sort (nub (merge (a, b)));
 
